@@ -137,8 +137,10 @@ jobs:
           export LUA_LIB=/d/build/lua54/install/lib
           cd /d/build/im/src
           make -k || true
-          cd /d/build/im/srclua5
-          make
+          if [ -d lua5W ]; then
+            cd lua5W
+            make
+          fi
           cd /d/build
 
       - name: Build pdflib_lite
