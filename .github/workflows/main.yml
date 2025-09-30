@@ -1,0 +1,177 @@
+name: Build IUP, CD, IM with Lua
+on:
+  push:
+  workflow_dispatch:
+
+env:
+  LUA_VERSION: "5.4.8"
+  IUP_VERSION: "3.32"
+  CD_VERSION: "5.14"
+  IM_VERSION: "3.15"
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - name: Install MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: |
+            git
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-make
+            make
+            tar
+            wget
+
+      - name: Download Lua source
+        run: |
+          wget --user-agent="Wget" -O lua-${{ env.LUA_VERSION }}.tar.gz \
+            https://www.lua.org/ftp/lua-${{ env.LUA_VERSION }}.tar.gz
+          tar -xzf lua-${{ env.LUA_VERSION }}.tar.gz
+
+      - name: Download IUP dependencies from SourceForge
+        run: |
+          wget --user-agent="Wget" -O zlib.tar.gz \
+            "https://sourceforge.net/projects/iup/files/${{ env.IUP_VERSION }}/Docs%20and%20Sources/zlib-1.2.11_Sources.tar.gz/download"
+          wget --user-agent="Wget" -O freetype.tar.gz \
+            "https://sourceforge.net/projects/iup/files/${{ env.IUP_VERSION }}/Docs%20and%20Sources/freetype-2.10.2_Sources.tar.gz/download"
+          wget --user-agent="Wget" -O ftgl.tar.gz \
+            "https://sourceforge.net/projects/iup/files/${{ env.IUP_VERSION }}/Docs%20and%20Sources/ftgl-2.1.5_Sources.tar.gz/download"
+          wget --user-agent="Wget" -O pdflib_lite.tar.gz \
+            "https://sourceforge.net/projects/canvasdraw/files/${{ env.CD_VERSION }}/Docs%20and%20Sources/pdflib_lite-7.0.5_Sources.tar.gz/download"
+          wget --user-agent="Wget" -O im.tar.gz \
+            "https://sourceforge.net/projects/imtoolkit/files/${{ env.IM_VERSION }}/Docs%20and%20Sources/im-${{ env.IM_VERSION }}_Sources.tar.gz/download"
+          wget --user-agent="Wget" -O cd.tar.gz \
+            "https://sourceforge.net/projects/canvasdraw/files/${{ env.CD_VERSION }}/Docs%20and%20Sources/cd-${{ env.CD_VERSION }}_Sources.tar.gz/download"
+          wget --user-agent="Wget" -O iup.tar.gz \
+            "https://sourceforge.net/projects/iup/files/${{ env.IUP_VERSION }}/Docs%20and%20Sources/iup-${{ env.IUP_VERSION }}_Sources.tar.gz/download"
+
+      - name: Extract all sources
+        run: |
+          tar -xzf zlib.tar.gz
+          tar -xzf freetype.tar.gz
+          tar -xzf ftgl.tar.gz
+          tar -xzf pdflib_lite.tar.gz
+          tar -xzf im.tar.gz
+          tar -xzf cd.tar.gz
+          tar -xzf iup.tar.gz
+          ls -la
+
+      - name: Build Lua
+        run: |
+          cd lua-${{ env.LUA_VERSION }}
+          make PLAT=mingw
+          make PLAT=mingw INSTALL_TOP=$HOME/dist install
+          cd ..
+
+      - name: Build zlib
+        run: |
+          cd zlib
+          cd src
+          make
+          cd ../..
+
+      - name: Build freetype
+        run: |
+          cd freetype
+          cd src
+          make
+          cd ../..
+
+      - name: Build ftgl
+        run: |
+          cd ftgl
+          cd src
+          make
+          cd ../..
+
+      - name: Build IM
+        run: |
+          cd im
+          cd src
+          make
+          cd ..
+          cd srclua5
+          make USE_LUA54=Yes
+          cd ../..
+
+      - name: Build pdflib_lite
+        run: |
+          cd pdflib_lite
+          cd src
+          make
+          cd ../..
+
+      - name: Build CD
+        run: |
+          cd cd
+          cd src
+          make
+          cd ..
+          cd srclua5
+          make USE_LUA54=Yes
+          cd ../..
+
+      - name: Build IUP
+        run: |
+          cd iup
+          make
+          cd ..
+
+      - name: Set padded build number
+        run: |
+          echo "PADDED_BUILD=$(printf '%04d' ${{ github.run_number }})" >> $GITHUB_ENV
+
+      - name: Package Results
+        run: |
+          mkdir -p dist/lib
+          mkdir -p dist/include
+          mkdir -p dist/bin
+          # Copy libraries and headers
+          cp -r $HOME/dist/* dist/
+          cp -r iup/lib/* dist/lib/ || true
+          cp -r cd/lib/* dist/lib/ || true
+          cp -r im/lib/* dist/lib/ || true
+          cp -r iup/include/* dist/include/ || true
+          cp -r cd/include/* dist/include/ || true
+          cp -r im/include/* dist/include/ || true
+          tar -czf iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64.tar.gz dist/
+
+      - name: Upload Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64
+          path: iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64.tar.gz
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64.tar.gz
+          tag_name: ${{ env.IUP_VERSION }}-build-${{ env.PADDED_BUILD }}
+          name: IUP/CD/IM ${{ env.IUP_VERSION }} Build ${{ env.PADDED_BUILD }}
+          body: |
+            Automated build of IUP/CD/IM ${{ env.IUP_VERSION }} with Lua ${{ env.LUA_VERSION }} for Windows x64
+
+            Includes:
+            - IUP ${{ env.IUP_VERSION }}
+            - CD ${{ env.CD_VERSION }}
+            - IM ${{ env.IM_VERSION }}
+            - Lua ${{ env.LUA_VERSION }}
+            - All dependencies (zlib, freetype, ftgl, pdflib_lite)
+            - Lua bindings for IUP, CD, IM
+
+            Built with MinGW-w64 on MSYS2
+            Build number: ${{ env.PADDED_BUILD }}
+            Commit: ${{ github.sha }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
