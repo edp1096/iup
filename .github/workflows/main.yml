@@ -85,8 +85,6 @@ jobs:
 
       - name: Build zlib
         run: |
-          export TEC_UNAME=mingw4_64
-          export MINGW4=/mingw64
           export USE_LUA_VERSION=54
           export NO_DEPEND=Yes
           export TECTOOLS_HOME=/d/build
@@ -96,8 +94,6 @@ jobs:
 
       - name: Build freetype
         run: |
-          export TEC_UNAME=mingw4_64
-          export MINGW4=/mingw64
           export NO_DEPEND=Yes
           cd /d/build/freetype/src
           make
@@ -105,8 +101,6 @@ jobs:
 
       - name: Build ftgl
         run: |
-          export TEC_UNAME=mingw4_64
-          export MINGW4=/mingw64
           export NO_DEPEND=Yes
           cd /d/build/ftgl/src
           make
@@ -114,8 +108,6 @@ jobs:
 
       - name: Build IM
         run: |
-          export TEC_UNAME=mingw4_64
-          export MINGW4=/mingw64
           export USE_LUA_VERSION=54
           export NO_DEPEND=Yes
           export TECTOOLS_HOME=/d/build
@@ -129,8 +121,6 @@ jobs:
 
       - name: Build pdflib_lite
         run: |
-          export TEC_UNAME=mingw4_64
-          export MINGW4=/mingw64
           export NO_DEPEND=Yes
           cd /d/build/pdflib_lite/src
           make
@@ -138,8 +128,6 @@ jobs:
 
       - name: Build CD
         run: |
-          export TEC_UNAME=mingw4_64
-          export MINGW4=/mingw64
           export USE_LUA_VERSION=54
           export NO_DEPEND=Yes
           export TECTOOLS_HOME=/d/build
@@ -153,8 +141,6 @@ jobs:
 
       - name: Build IUP
         run: |
-          export TEC_UNAME=mingw4_64
-          export MINGW4=/mingw64
           export USE_LUA_VERSION=54
           export NO_DEPEND=Yes
           export TECTOOLS_HOME=/d/build
