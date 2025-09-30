@@ -32,6 +32,7 @@ jobs:
             make
             tar
             wget
+            sed
 
       - name: Create build directory
         run: |
@@ -75,6 +76,18 @@ jobs:
           tar -xzf cd.tar.gz
           tar -xzf iup.tar.gz
           ls -la
+
+      - name: Patch Tecmake files for MSYS2
+        run: |
+          cd /d/build
+          find . -name "tecmakewin.mak" -exec sed -i \
+            -e 's|x:/lng/mingw4_64|/mingw64|g' \
+            -e 's|\$\(TEC_TOOLCHAIN\)gcc|gcc|g' \
+            -e 's|\$\(TEC_TOOLCHAIN\)g++|g++|g' \
+            -e 's|\$\(TEC_TOOLCHAIN\)ar|ar|g' \
+            -e 's|\$\(TEC_TOOLCHAIN\)ranlib|ranlib|g' \
+            {} \;
+          echo "Tecmake files patched for MSYS2"
 
       - name: Build Lua
         run: |
@@ -171,13 +184,10 @@ jobs:
       - name: Package Results
         run: |
           mkdir -p /d/dist/{lib,include,bin}
-          # Copy Lua
           cp -r /d/build/lua54/install/* /d/dist/
-          # Copy libraries
           find /d/build/iup/lib -name "*.a" -o -name "*.dll" | xargs -I {} cp {} /d/dist/lib/ 2>/dev/null || true
           find /d/build/cd/lib -name "*.a" -o -name "*.dll" | xargs -I {} cp {} /d/dist/lib/ 2>/dev/null || true
           find /d/build/im/lib -name "*.a" -o -name "*.dll" | xargs -I {} cp {} /d/dist/lib/ 2>/dev/null || true
-          # Copy headers
           cp -r /d/build/iup/include/* /d/dist/include/ 2>/dev/null || true
           cp -r /d/build/cd/include/* /d/dist/include/ 2>/dev/null || true
           cp -r /d/build/im/include/* /d/dist/include/ 2>/dev/null || true
