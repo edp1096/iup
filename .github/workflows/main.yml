@@ -83,20 +83,10 @@ jobs:
           make PLAT=mingw INSTALL_TOP=/d/build/lua54/install install
           cd ..
 
-      - name: Set Tecmake environment variables
-        run: |
-          echo "export TEC_UNAME=mingw4_64" >> ~/.bashrc
-          echo "export USE_LUA_VERSION=54" >> ~/.bashrc
-          echo "export NO_DEPEND=Yes" >> ~/.bashrc
-          echo "export TECTOOLS_HOME=/d/build" >> ~/.bashrc
-          echo "export LUA_SUFFIX=" >> ~/.bashrc
-          echo "export LUA_INC=/d/build/lua54/install/include" >> ~/.bashrc
-          echo "export LUA_LIB=/d/build/lua54/install/lib" >> ~/.bashrc
-          source ~/.bashrc
-
       - name: Build zlib
         run: |
           export TEC_UNAME=mingw4_64
+          export MINGW4=/mingw64
           export USE_LUA_VERSION=54
           export NO_DEPEND=Yes
           export TECTOOLS_HOME=/d/build
@@ -107,6 +97,7 @@ jobs:
       - name: Build freetype
         run: |
           export TEC_UNAME=mingw4_64
+          export MINGW4=/mingw64
           export NO_DEPEND=Yes
           cd /d/build/freetype/src
           make
@@ -115,6 +106,7 @@ jobs:
       - name: Build ftgl
         run: |
           export TEC_UNAME=mingw4_64
+          export MINGW4=/mingw64
           export NO_DEPEND=Yes
           cd /d/build/ftgl/src
           make
@@ -123,6 +115,7 @@ jobs:
       - name: Build IM
         run: |
           export TEC_UNAME=mingw4_64
+          export MINGW4=/mingw64
           export USE_LUA_VERSION=54
           export NO_DEPEND=Yes
           export TECTOOLS_HOME=/d/build
@@ -137,6 +130,7 @@ jobs:
       - name: Build pdflib_lite
         run: |
           export TEC_UNAME=mingw4_64
+          export MINGW4=/mingw64
           export NO_DEPEND=Yes
           cd /d/build/pdflib_lite/src
           make
@@ -145,6 +139,7 @@ jobs:
       - name: Build CD
         run: |
           export TEC_UNAME=mingw4_64
+          export MINGW4=/mingw64
           export USE_LUA_VERSION=54
           export NO_DEPEND=Yes
           export TECTOOLS_HOME=/d/build
@@ -159,6 +154,7 @@ jobs:
       - name: Build IUP
         run: |
           export TEC_UNAME=mingw4_64
+          export MINGW4=/mingw64
           export USE_LUA_VERSION=54
           export NO_DEPEND=Yes
           export TECTOOLS_HOME=/d/build
