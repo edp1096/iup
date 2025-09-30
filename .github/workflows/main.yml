@@ -33,6 +33,7 @@ jobs:
             tar
             wget
             sed
+            mingw-w64-x86_64-fftw
 
       - name: Create build directory
         run: |
@@ -214,7 +215,7 @@ jobs:
             - CD ${{ env.CD_VERSION }}
             - IM ${{ env.IM_VERSION }}
             - Lua ${{ env.LUA_VERSION }}
-            - All dependencies (zlib, freetype, ftgl, pdflib_lite)
+            - All dependencies (zlib, freetype, ftgl, fftw3, pdflib_lite)
             - Lua bindings for IUP, CD, IM
 
             Built with MinGW-w64 on MSYS2
