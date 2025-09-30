@@ -33,14 +33,22 @@ jobs:
             tar
             wget
 
+      - name: Create build directory
+        run: |
+          mkdir -p /d/build
+          cd /d/build
+
       - name: Download Lua source
         run: |
+          cd /d/build
           wget --user-agent="Wget" -O lua-${{ env.LUA_VERSION }}.tar.gz \
             https://www.lua.org/ftp/lua-${{ env.LUA_VERSION }}.tar.gz
           tar -xzf lua-${{ env.LUA_VERSION }}.tar.gz
+          mv lua-${{ env.LUA_VERSION }} lua54
 
       - name: Download IUP dependencies from SourceForge
         run: |
+          cd /d/build
           wget --user-agent="Wget" -O zlib.tar.gz \
             "https://sourceforge.net/projects/iup/files/${{ env.IUP_VERSION }}/Docs%20and%20Sources/zlib-1.2.11_Sources.tar.gz/download"
           wget --user-agent="Wget" -O freetype.tar.gz \
@@ -58,6 +66,7 @@ jobs:
 
       - name: Extract all sources
         run: |
+          cd /d/build
           tar -xzf zlib.tar.gz
           tar -xzf freetype.tar.gz
           tar -xzf ftgl.tar.gz
@@ -69,62 +78,93 @@ jobs:
 
       - name: Build Lua
         run: |
-          cd lua-${{ env.LUA_VERSION }}
+          cd /d/build/lua54
           make PLAT=mingw
-          make PLAT=mingw INSTALL_TOP=$HOME/dist install
+          make PLAT=mingw INSTALL_TOP=/d/build/lua54/install install
           cd ..
+
+      - name: Set Tecmake environment variables
+        run: |
+          echo "export TEC_UNAME=mingw4_64" >> ~/.bashrc
+          echo "export USE_LUA_VERSION=54" >> ~/.bashrc
+          echo "export NO_DEPEND=Yes" >> ~/.bashrc
+          echo "export TECTOOLS_HOME=/d/build" >> ~/.bashrc
+          echo "export LUA_SUFFIX=" >> ~/.bashrc
+          echo "export LUA_INC=/d/build/lua54/install/include" >> ~/.bashrc
+          echo "export LUA_LIB=/d/build/lua54/install/lib" >> ~/.bashrc
+          source ~/.bashrc
 
       - name: Build zlib
         run: |
-          cd zlib
-          cd src
+          export TEC_UNAME=mingw4_64
+          export USE_LUA_VERSION=54
+          export NO_DEPEND=Yes
+          export TECTOOLS_HOME=/d/build
+          cd /d/build/zlib/src
           make
           cd ../..
 
       - name: Build freetype
         run: |
-          cd freetype
-          cd src
+          export TEC_UNAME=mingw4_64
+          export NO_DEPEND=Yes
+          cd /d/build/freetype/src
           make
           cd ../..
 
       - name: Build ftgl
         run: |
-          cd ftgl
-          cd src
+          export TEC_UNAME=mingw4_64
+          export NO_DEPEND=Yes
+          cd /d/build/ftgl/src
           make
           cd ../..
 
       - name: Build IM
         run: |
-          cd im
-          cd src
+          export TEC_UNAME=mingw4_64
+          export USE_LUA_VERSION=54
+          export NO_DEPEND=Yes
+          export TECTOOLS_HOME=/d/build
+          export LUA_INC=/d/build/lua54/install/include
+          export LUA_LIB=/d/build/lua54/install/lib
+          cd /d/build/im/src
           make
-          cd ..
-          cd srclua5
-          make USE_LUA54=Yes
+          cd ../srclua5
+          make
           cd ../..
 
       - name: Build pdflib_lite
         run: |
-          cd pdflib_lite
-          cd src
+          export TEC_UNAME=mingw4_64
+          export NO_DEPEND=Yes
+          cd /d/build/pdflib_lite/src
           make
           cd ../..
 
       - name: Build CD
         run: |
-          cd cd
-          cd src
+          export TEC_UNAME=mingw4_64
+          export USE_LUA_VERSION=54
+          export NO_DEPEND=Yes
+          export TECTOOLS_HOME=/d/build
+          export LUA_INC=/d/build/lua54/install/include
+          export LUA_LIB=/d/build/lua54/install/lib
+          cd /d/build/cd/src
           make
-          cd ..
-          cd srclua5
-          make USE_LUA54=Yes
+          cd ../srclua5
+          make
           cd ../..
 
       - name: Build IUP
         run: |
-          cd iup
+          export TEC_UNAME=mingw4_64
+          export USE_LUA_VERSION=54
+          export NO_DEPEND=Yes
+          export TECTOOLS_HOME=/d/build
+          export LUA_INC=/d/build/lua54/install/include
+          export LUA_LIB=/d/build/lua54/install/lib
+          cd /d/build/iup
           make
           cd ..
 
@@ -134,29 +174,30 @@ jobs:
 
       - name: Package Results
         run: |
-          mkdir -p dist/lib
-          mkdir -p dist/include
-          mkdir -p dist/bin
-          # Copy libraries and headers
-          cp -r $HOME/dist/* dist/
-          cp -r iup/lib/* dist/lib/ || true
-          cp -r cd/lib/* dist/lib/ || true
-          cp -r im/lib/* dist/lib/ || true
-          cp -r iup/include/* dist/include/ || true
-          cp -r cd/include/* dist/include/ || true
-          cp -r im/include/* dist/include/ || true
+          mkdir -p /d/dist/{lib,include,bin}
+          # Copy Lua
+          cp -r /d/build/lua54/install/* /d/dist/
+          # Copy libraries
+          find /d/build/iup/lib -name "*.a" -o -name "*.dll" | xargs -I {} cp {} /d/dist/lib/ 2>/dev/null || true
+          find /d/build/cd/lib -name "*.a" -o -name "*.dll" | xargs -I {} cp {} /d/dist/lib/ 2>/dev/null || true
+          find /d/build/im/lib -name "*.a" -o -name "*.dll" | xargs -I {} cp {} /d/dist/lib/ 2>/dev/null || true
+          # Copy headers
+          cp -r /d/build/iup/include/* /d/dist/include/ 2>/dev/null || true
+          cp -r /d/build/cd/include/* /d/dist/include/ 2>/dev/null || true
+          cp -r /d/build/im/include/* /d/dist/include/ 2>/dev/null || true
+          cd /d
           tar -czf iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64.tar.gz dist/
 
       - name: Upload Build
         uses: actions/upload-artifact@v4
         with:
           name: iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64
-          path: iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64.tar.gz
+          path: /d/iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64.tar.gz
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64.tar.gz
+          files: /d/iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64.tar.gz
           tag_name: ${{ env.IUP_VERSION }}-build-${{ env.PADDED_BUILD }}
           name: IUP/CD/IM ${{ env.IUP_VERSION }} Build ${{ env.PADDED_BUILD }}
           body: |
