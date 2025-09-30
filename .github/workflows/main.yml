@@ -137,9 +137,9 @@ jobs:
           export LUA_LIB=/d/build/lua54/install/lib
           cd /d/build/im/src
           make -k || true
-          cd ../srclua5
+          cd /d/build/im/srclua5
           make
-          cd ../..
+          cd /d/build
 
       - name: Build pdflib_lite
         run: |
@@ -218,7 +218,7 @@ jobs:
             - All dependencies (zlib, freetype, ftgl, fftw3, pdflib_lite)
             - Lua bindings for IUP, CD, IM
 
-            Note: im_wmv module skipped (not supported in MinGW)
+            Note: im_wmv, im_capture modules skipped (not supported in MinGW)
 
             Built with MinGW-w64 on MSYS2
             Build number: ${{ env.PADDED_BUILD }}
