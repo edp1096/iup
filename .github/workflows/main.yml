@@ -190,6 +190,7 @@ jobs:
           export TECTOOLS_HOME=/d/build
           export LUA_INC=/d/build/lua54/install/include
           export LUA_LIB=/d/build/lua54/install/lib
+          export FLAGS="-Wno-error=incompatible-pointer-types"
           cd /d/build/iup
           make
           cd ..
