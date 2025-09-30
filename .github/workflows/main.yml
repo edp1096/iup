@@ -148,9 +148,16 @@ jobs:
           export TEC_UNAME=mingw4_64
           export TEC_TOOLCHAIN=""
           export NO_DEPEND=Yes
-          cd /d/build/pdflib_lite/src
+          if [ -d /d/build/pdflib_lite-7.0.5/pdflib7/src ]; then
+            cd /d/build/pdflib_lite-7.0.5/pdflib7/src
+          elif [ -d /d/build/pdflib_lite/src ]; then
+            cd /d/build/pdflib_lite/src
+          else
+            echo "pdflib_lite src not found, skipping"
+            exit 0
+          fi
           make
-          cd ../..
+          cd /d/build
 
       - name: Build CD
         run: |
@@ -191,9 +198,15 @@ jobs:
           find /d/build/iup/lib -name "*.a" -o -name "*.dll" | xargs -I {} cp {} /d/dist/lib/ 2>/dev/null || true
           find /d/build/cd/lib -name "*.a" -o -name "*.dll" | xargs -I {} cp {} /d/dist/lib/ 2>/dev/null || true
           find /d/build/im/lib -name "*.a" -o -name "*.dll" | xargs -I {} cp {} /d/dist/lib/ 2>/dev/null || true
+          if [ -d /d/build/pdflib_lite-7.0.5/pdflib7/lib ]; then
+            find /d/build/pdflib_lite-7.0.5/pdflib7/lib -name "*.a" -o -name "*.dll" | xargs -I {} cp {} /d/dist/lib/ 2>/dev/null || true
+          fi
           cp -r /d/build/iup/include/* /d/dist/include/ 2>/dev/null || true
           cp -r /d/build/cd/include/* /d/dist/include/ 2>/dev/null || true
           cp -r /d/build/im/include/* /d/dist/include/ 2>/dev/null || true
+          if [ -d /d/build/pdflib_lite-7.0.5/pdflib7/include ]; then
+            cp -r /d/build/pdflib_lite-7.0.5/pdflib7/include/* /d/dist/include/ 2>/dev/null || true
+          fi
           cd /d
           tar -czf iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64.tar.gz dist/
 
