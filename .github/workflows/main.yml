@@ -86,75 +86,82 @@ jobs:
       - name: Build zlib
         run: |
           export TEC_UNAME=mingw4_64
+          export TEC_TOOLCHAIN=""
           export USE_LUA_VERSION=54
           export NO_DEPEND=Yes
           export TECTOOLS_HOME=/d/build
           cd /d/build/zlib/src
-          make CC=gcc CPPC=g++ AR=ar RANLIB=ranlib
+          make
           cd ../..
 
       - name: Build freetype
         run: |
           export TEC_UNAME=mingw4_64
+          export TEC_TOOLCHAIN=""
           export NO_DEPEND=Yes
           cd /d/build/freetype/src
-          make CC=gcc CPPC=g++ AR=ar RANLIB=ranlib
+          make
           cd ../..
 
       - name: Build ftgl
         run: |
           export TEC_UNAME=mingw4_64
+          export TEC_TOOLCHAIN=""
           export NO_DEPEND=Yes
           cd /d/build/ftgl/src
-          make CC=gcc CPPC=g++ AR=ar RANLIB=ranlib
+          make
           cd ../..
 
       - name: Build IM
         run: |
           export TEC_UNAME=mingw4_64
+          export TEC_TOOLCHAIN=""
           export USE_LUA_VERSION=54
           export NO_DEPEND=Yes
           export TECTOOLS_HOME=/d/build
           export LUA_INC=/d/build/lua54/install/include
           export LUA_LIB=/d/build/lua54/install/lib
           cd /d/build/im/src
-          make CC=gcc CPPC=g++ AR=ar RANLIB=ranlib
+          make
           cd ../srclua5
-          make CC=gcc CPPC=g++ AR=ar RANLIB=ranlib
+          make
           cd ../..
 
       - name: Build pdflib_lite
         run: |
           export TEC_UNAME=mingw4_64
+          export TEC_TOOLCHAIN=""
           export NO_DEPEND=Yes
           cd /d/build/pdflib_lite/src
-          make CC=gcc CPPC=g++ AR=ar RANLIB=ranlib
+          make
           cd ../..
 
       - name: Build CD
         run: |
           export TEC_UNAME=mingw4_64
+          export TEC_TOOLCHAIN=""
           export USE_LUA_VERSION=54
           export NO_DEPEND=Yes
           export TECTOOLS_HOME=/d/build
           export LUA_INC=/d/build/lua54/install/include
           export LUA_LIB=/d/build/lua54/install/lib
           cd /d/build/cd/src
-          make CC=gcc CPPC=g++ AR=ar RANLIB=ranlib
+          make
           cd ../srclua5
-          make CC=gcc CPPC=g++ AR=ar RANLIB=ranlib
+          make
           cd ../..
 
       - name: Build IUP
         run: |
           export TEC_UNAME=mingw4_64
+          export TEC_TOOLCHAIN=""
           export USE_LUA_VERSION=54
           export NO_DEPEND=Yes
           export TECTOOLS_HOME=/d/build
           export LUA_INC=/d/build/lua54/install/include
           export LUA_LIB=/d/build/lua54/install/lib
           cd /d/build/iup
-          make CC=gcc CPPC=g++ AR=ar RANLIB=ranlib
+          make
           cd ..
 
       - name: Set padded build number
