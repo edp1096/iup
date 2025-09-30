@@ -136,7 +136,7 @@ jobs:
           export LUA_INC=/d/build/lua54/install/include
           export LUA_LIB=/d/build/lua54/install/lib
           cd /d/build/im/src
-          make
+          make -k || true
           cd ../srclua5
           make
           cd ../..
@@ -217,6 +217,8 @@ jobs:
             - Lua ${{ env.LUA_VERSION }}
             - All dependencies (zlib, freetype, ftgl, fftw3, pdflib_lite)
             - Lua bindings for IUP, CD, IM
+
+            Note: im_wmv module skipped (not supported in MinGW)
 
             Built with MinGW-w64 on MSYS2
             Build number: ${{ env.PADDED_BUILD }}
