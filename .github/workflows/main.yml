@@ -263,17 +263,17 @@ jobs:
           # Build core IUP libraries
           make iup iupcd iupcontrols iupgl iupglcontrols iup_plot iup_scintilla iupim iupimglib iupole
           
-          # Build iupstub as STATIC library
-          cd src
-          TEC_UNAME=mingw4_64 make -f iupstub.mak
+          # Patch iupstub.mak to remove USE_DLL
+          sed -i '/USE_DLL = Yes/d' src/iupstub.mak
+          
+          # Build iupstub as static library
+          make -C src -f iupstub.mak
           
           # Build Lua bindings
-          cd ../srclua5
-          TEC_UNAME=dllw4_64 make -k || true
+          make -C srclua5 -k || true
           
           # Build iuplua console
-          cd /d/build/iup
-          TEC_UNAME=dllw4_64 make iupluaconsole
+          make iupluaconsole
           
           if [ ! -f lib/dllw4_64/iup.dll ]; then
             echo "ERROR: Core IUP DLL failed"
