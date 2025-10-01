@@ -257,20 +257,17 @@ jobs:
           export LUA_LIB=/d/build/lua54/install/lib
           export LUA_BIN=/d/build/lua54/install/bin
           export FLAGS="-Wno-error=incompatible-pointer-types"
-
-          # Build iupstub first (needed for executables)
-          cd /d/build/iup/src
-          make -f iupstub.mak
+          
+          cd /d/build/iup
           
           # Build core IUP libraries
-          cd /d/build/iup
           make iup iupcd iupcontrols iupgl iupglcontrols iup_plot iup_scintilla iupim iupimglib iupole
           
           # Build Lua bindings
           cd srclua5
           make -k || true
           
-          # Build iuplua console executable
+          # Build iuplua console
           cd /d/build/iup
           make iupluaconsole
           
@@ -279,14 +276,13 @@ jobs:
             exit 1
           fi
           
-          echo "=== Checking for iupluaconsole executable ==="
-          find . -name "*console*.exe" -o -name "iuplua*.exe"
+          echo "=== Checking executables ==="
+          find . -name "*.exe"
           
           ls ../lib/dllw4_64
           ls ..
           pwd
 
-          echo "IUP build successful"
           cd /d/build
 
       - name: Verify Build Results
