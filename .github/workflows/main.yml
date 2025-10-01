@@ -138,18 +138,12 @@ jobs:
           export LUA_INC=/d/build/lua54/install/include
           export LUA_LIB=/d/build/lua54/install/lib
           cd /d/build/im/src
-          make -k
-          EXIT_CODE=$?
-          cd /d/build/im
-          if [ ! -f lib/mingw4_64/libim.a ]; then
-            echo "ERROR: Core IM library failed to build"
-            exit 1
-          fi
-          echo "Core IM library built successfully"
-          if [ $EXIT_CODE -ne 0 ]; then
-            echo "Warning: Some optional IM modules failed (expected for wmv/capture)"
-          fi
-          cd src
+          # Remove unsupported video modules from Makefile
+          sed -i 's/ im_wmv//g' Makefile
+          sed -i 's/ imlua_wmv5//g' Makefile
+          sed -i 's/ im_capture//g' Makefile
+          sed -i 's/ imlua_capture5//g' Makefile
+          make
           if [ -d lua5W ]; then
             cd lua5W
             make
