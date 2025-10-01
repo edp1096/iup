@@ -181,7 +181,7 @@ jobs:
 
           # Build core IM libraries
           cd /d/build/im/src
-          make im im_process im_jp2 im_avi imlua_process5 imlua_process_omp5 imlua5 imlua_process5 imlua_jp25
+          make im im_process im_jp2 im_avi
 
           if [ ! -f ../lib/dllw4_64/im.dll ]; then
             echo "ERROR: Core IM DLL failed to build"
