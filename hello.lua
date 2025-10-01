@@ -1,3 +1,4 @@
+package.cpath = package.cpath .. ";?54.dll"
 require("iuplua")
 require("iupluacontrols")
 

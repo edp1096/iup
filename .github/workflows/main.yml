@@ -41,16 +41,13 @@ jobs:
         run: |
           mkdir -p /d/build/lua54/install/{bin,lib,include}
           
-          # Check what's actually installed
           echo "=== Checking MSYS2 Lua files ==="
           ls -la /mingw64/bin/lua* || true
           ls -la /mingw64/lib/liblua* || true
           
-          # Copy executables
           cp /mingw64/bin/lua.exe /d/build/lua54/install/bin/ 2>/dev/null || cp /mingw64/bin/lua54.exe /d/build/lua54/install/bin/lua.exe
           cp /mingw64/bin/luac.exe /d/build/lua54/install/bin/ 2>/dev/null || cp /mingw64/bin/luac54.exe /d/build/lua54/install/bin/luac.exe
           
-          # Copy DLL with proper naming
           if [ -f /mingw64/bin/lua54.dll ]; then
             cp /mingw64/bin/lua54.dll /d/build/lua54/install/bin/
           elif [ -f /mingw64/bin/lua5.4.dll ]; then
@@ -59,14 +56,12 @@ jobs:
             cp /mingw64/bin/liblua.dll /d/build/lua54/install/bin/lua54.dll
           fi
           
-          # Copy import library with proper naming
           if [ -f /mingw64/lib/liblua.dll.a ]; then
             cp /mingw64/lib/liblua.dll.a /d/build/lua54/install/lib/liblua54.a
           elif [ -f /mingw64/lib/liblua.a ]; then
             cp /mingw64/lib/liblua.a /d/build/lua54/install/lib/liblua54.a
           fi
           
-          # Copy headers
           cp /mingw64/include/lua*.h /d/build/lua54/install/include/
           
           echo "=== Copied Lua files ==="
@@ -75,8 +70,7 @@ jobs:
 
       - name: Create build directory
         run: |
-          mkdir -p /d/build
-          cd /d/build
+          mkdir -p /d/build /d/dist/{bin,lib,include}
 
       - name: Check GCC version and write to gcc_version.txt
         run: |
@@ -109,7 +103,6 @@ jobs:
           tar -xzf im.tar.gz
           tar -xzf cd.tar.gz
           tar -xzf iup.tar.gz
-          ls -la
 
       - name: Patch Tecmake files for MSYS2
         run: |
@@ -122,95 +115,77 @@ jobs:
             -e 's|\$\(TEC_TOOLCHAIN\)ar|ar|g' \
             -e 's|\$\(TEC_TOOLCHAIN\)ranlib|ranlib|g' \
             {} \;
-          echo "Tecmake files patched for MSYS2"
 
       - name: Build zlib
         run: |
           export TEC_UNAME=dllw4_64
           export TEC_TOOLCHAIN=""
-          # export USE_LUA_VERSION=54
           export NO_DEPEND=Yes
           export TECTOOLS_HOME=/d/build
+          
           cd /d/build/zlib/src
           make
-
-          ls ../lib/dllw4_64
-          ls ..
-          pwd
-
-          cd ../..
+          
+          cp ../lib/dllw4_64/*.dll /d/dist/bin/
+          cp ../lib/dllw4_64/*.a /d/dist/lib/
+          cd /d/build
 
       - name: Build freetype
         run: |
           export TEC_UNAME=dllw4_64
           export TEC_TOOLCHAIN=""
           export NO_DEPEND=Yes
+          
           cd /d/build/freetype/src
           make
-
-          ls ../lib/dllw4_64
-          ls ..
-          pwd
-
-          cd ../..
+          
+          cp ../lib/dllw4_64/*.dll /d/dist/bin/
+          cp ../lib/dllw4_64/*.a /d/dist/lib/
+          cd /d/build
 
       - name: Build ftgl
         run: |
           export TEC_UNAME=dllw4_64
           export TEC_TOOLCHAIN=""
           export NO_DEPEND=Yes
+          
           cd /d/build/ftgl/src
           make
-
-          ls ../lib/dllw4_64
-          ls ..
-          pwd
-
-          cd ../..
+          
+          cp ../lib/dllw4_64/*.dll /d/dist/bin/ 2>/dev/null || true
+          cp ../lib/dllw4_64/*.a /d/dist/lib/ 2>/dev/null || true
+          cd /d/build
 
       - name: Build IM
         run: |
           export TEC_UNAME=dllw4_64
           export TEC_TOOLCHAIN=""
-          # export USE_LUA_VERSION=54
+          export USE_LUA_VERSION=54
           export NO_DEPEND=Yes
           export TECTOOLS_HOME=/d/build
           export LUA_INC=/d/build/lua54/install/include
           export LUA_LIB=/d/build/lua54/install/lib
           export LUA_BIN=/d/build/lua54/install/bin
 
-          # Build core IM libraries
           cd /d/build/im/src
-          # make im im_process im_jp2 im_avi
           make im im_jp2 im_process im_process_omp im_avi
 
           if [ ! -f ../lib/dllw4_64/im.dll ]; then
             echo "ERROR: Core IM DLL failed to build"
             exit 1
           fi
-          echo "Core IM DLL built successfully"
 
-          # Build Lua bindings
-          echo "=== Building Lua bindings ==="
           make imlua5 imlua_process5 imlua_jp25 imlua_process_omp5 imlua_avi5
 
-          if [ $? -ne 0 ]; then
-            echo "ERROR: Lua bindings build failed"
-            exit 1
-          fi
-
-          ls ../lib/dllw4_64
-          ls ..
-          pwd
-
-          echo "IM Lua bindings built successfully"
+          find ../lib/dllw4_64 -name "*.dll" -exec cp -v {} /d/dist/bin/ \;
+          find ../lib/dllw4_64 -name "*.a" -exec cp -v {} /d/dist/lib/ \;
           cd /d/build
 
       - name: Build CD
         run: |
           export TEC_UNAME=dllw4_64
           export TEC_TOOLCHAIN=""
-          # export USE_LUA_VERSION=54
+          export USE_LUA_VERSION=54
           export NO_DEPEND=Yes
           export TECTOOLS_HOME=/d/build
           export LUA_INC=/d/build/lua54/install/include
@@ -219,38 +194,24 @@ jobs:
           export FLAGS="-Wno-error=incompatible-pointer-types"
 
           cd /d/build/cd/src
-
-          # Build core CD modules (excluding cdpdf which requires pdflib)
-          echo "=== Building CD core libraries ==="
           make cd cdgl cdim cdcontextplus
 
           if [ ! -f ../lib/dllw4_64/cd.dll ]; then
             echo "ERROR: Core CD DLL failed to build"
             exit 1
           fi
-          echo "Core CD libraries built successfully"
 
-          # Build CD Lua bindings (excluding cdluapdf5 which requires pdflib)
-          echo "=== Building CD Lua bindings ==="
           make cdlua5 cdluagl5 cdluaim5 cdluacontextplus5
 
-          if [ $? -ne 0 ]; then
-            echo "ERROR: CD Lua bindings build failed"
-            exit 1
-          fi
-
-          ls ../lib/dllw4_64
-          ls ..
-          pwd
-
-          echo "CD Lua bindings built successfully"
+          find ../lib/dllw4_64 -name "*.dll" -exec cp -v {} /d/dist/bin/ \;
+          find ../lib/dllw4_64 -name "*.a" -exec cp -v {} /d/dist/lib/ \;
           cd /d/build
 
       - name: Build IUP
         run: |
           export TEC_UNAME=dllw4_64
           export TEC_TOOLCHAIN=""
-          # export USE_LUA_VERSION=54
+          export USE_LUA_VERSION=54
           export NO_DEPEND=Yes
           export TECTOOLS_HOME=/d/build
           export LUA_INC=/d/build/lua54/install/include
@@ -259,21 +220,15 @@ jobs:
           export FLAGS="-Wno-error=incompatible-pointer-types"
           
           cd /d/build/iup
-          
-          # Build core IUP libraries
           make iup iupcd iupcontrols iupgl iupglcontrols iup_plot iup_scintilla iupim iupimglib iupole
           
-          # Build iupstub with mingw4_64 (static)
           cd src
           TEC_UNAME=mingw4_64 make -f ../tecmakewin.mak MF=iupstub
           mkdir -p ../lib/dllw4_64
           mv ../lib/mingw4_64/libiupstub.a ../lib/dllw4_64/
           cd ..
           
-          # Build Lua bindings
           make -C srclua5 -k || true
-          
-          # Build iuplua console
           make iupluaconsole
           
           if [ ! -f lib/dllw4_64/iup.dll ]; then
@@ -281,56 +236,37 @@ jobs:
             exit 1
           fi
           
-          find . -name "*.exe"
+          find lib/dllw4_64 -name "*.dll" -exec cp -v {} /d/dist/bin/ \;
+          find lib/dllw4_64 -name "*.a" -exec cp -v {} /d/dist/lib/ \;
+          find bin -name "*.exe" -exec cp -v {} /d/dist/bin/ \;
           cd /d/build
 
-      - name: Verify Build Results
+      - name: Package Results
         run: |
-          echo "=== Checking built libraries ==="
-          echo "--- IUP DLLs ---"
-          find /d/build/iup/lib/dllw4_64 -name "*.dll" 2>/dev/null | head -20
-          echo "--- CD DLLs ---"
-          find /d/build/cd/lib/dllw4_64 -name "*.dll" 2>/dev/null | head -20
-          echo "--- IM DLLs ---"
-          find /d/build/im/lib/dllw4_64 -name "*.dll" 2>/dev/null | head -20
+          echo "Copying Lua..."
+          cp -r /d/build/lua54/install/* /d/dist/
+
+          echo "Copying headers..."
+          cp -r /d/build/iup/include/* /d/dist/include/
+          cp -r /d/build/cd/include/* /d/dist/include/
+          cp -r /d/build/im/include/* /d/dist/include/
+
+          echo "=== Package contents ==="
+          echo "Executables:"
+          ls -lah /d/dist/bin/*.exe 2>/dev/null || true
+          echo ""
+          echo "DLLs:"
+          ls -lah /d/dist/bin/*.dll 2>/dev/null | head -50
+          echo ""
+          echo "Import libraries:"
+          ls -lah /d/dist/lib/*.a 2>/dev/null | head -20
 
       - name: Set padded build number
         run: |
           echo "PADDED_BUILD=$(printf '%04d' ${{ github.run_number }})" >> $GITHUB_ENV
 
-      - name: Package Results
+      - name: Create Archive
         run: |
-          mkdir -p /d/dist/{lib,include,bin}
-
-          echo "Copying Lua..."
-          cp -r /d/build/lua54/install/* /d/dist/
-
-          echo "Copying IUP executables..."
-          find /d/build/iup/bin -name "*.exe" -exec cp -v {} /d/dist/bin/ \;
-
-          echo "Copying IUP DLLs and import libraries..."
-          find /d/build/iup/lib/dllw4_64 -type f \( -name "*.dll" -o -name "*.a" \) -exec cp -v {} /d/dist/bin/ \;
-
-          echo "Copying CD DLLs and import libraries..."
-          find /d/build/cd/lib/dllw4_64 -type f \( -name "*.dll" -o -name "*.a" \) -exec cp -v {} /d/dist/bin/ \;
-
-          echo "Copying IM DLLs and import libraries..."
-          find /d/build/im/lib/dllw4_64 -type f \( -name "*.dll" -o -name "*.a" \) -exec cp -v {} /d/dist/bin/ \;
-
-          echo "Copying headers..."
-          cp -r /d/build/iup/include/* /d/dist/include/ 2>/dev/null || true
-          cp -r /d/build/cd/include/* /d/dist/include/ 2>/dev/null || true
-          cp -r /d/build/im/include/* /d/dist/include/ 2>/dev/null || true
-
-          echo "=== Package contents ==="
-          echo "Executables:"
-          ls -lah /d/dist/bin/*.exe 2>/dev/null
-          echo "DLLs:"
-          ls -lah /d/dist/bin/*.dll 2>/dev/null | head -30
-          echo "Import libraries:"
-          ls -lah /d/dist/bin/*.a 2>/dev/null | head -10
-
-          # Create tar.gz in GitHub workspace
           cd $GITHUB_WORKSPACE
           tar -czf iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64-dll.tar.gz -C /d dist/
           ls -lh *.tar.gz
@@ -355,11 +291,12 @@ jobs:
             - CD ${{ env.CD_VERSION }} (DLL)
             - IM ${{ env.IM_VERSION }} (DLL)
             - Lua ${{ env.LUA_VERSION }}
-            - iuplua.exe (Lua interpreter with IUP)
+            - iuplua54.exe (Lua interpreter with IUP)
             - All dependencies (zlib, freetype, ftgl)
             - Lua bindings for IUP, CD, IM
 
             Executables and DLLs are in the bin/ directory
+            Import libraries (.a) are in the lib/ directory
             Headers are in the include/ directory
 
             Built with MinGW-w64 on MSYS2
