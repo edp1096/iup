@@ -128,7 +128,7 @@ jobs:
         run: |
           export TEC_UNAME=dllw4_64
           export TEC_TOOLCHAIN=""
-          export USE_LUA_VERSION=54
+          # export USE_LUA_VERSION=54
           export NO_DEPEND=Yes
           export TECTOOLS_HOME=/d/build
           cd /d/build/zlib/src
@@ -172,7 +172,7 @@ jobs:
         run: |
           export TEC_UNAME=dllw4_64
           export TEC_TOOLCHAIN=""
-          export USE_LUA_VERSION=54
+          # export USE_LUA_VERSION=54
           export NO_DEPEND=Yes
           export TECTOOLS_HOME=/d/build
           export LUA_INC=/d/build/lua54/install/include
@@ -210,7 +210,7 @@ jobs:
         run: |
           export TEC_UNAME=dllw4_64
           export TEC_TOOLCHAIN=""
-          export USE_LUA_VERSION=54
+          # export USE_LUA_VERSION=54
           export NO_DEPEND=Yes
           export TECTOOLS_HOME=/d/build
           export LUA_INC=/d/build/lua54/install/include
@@ -250,7 +250,7 @@ jobs:
         run: |
           export TEC_UNAME=dllw4_64
           export TEC_TOOLCHAIN=""
-          export USE_LUA_VERSION=54
+          # export USE_LUA_VERSION=54
           export NO_DEPEND=Yes
           export TECTOOLS_HOME=/d/build
           export LUA_INC=/d/build/lua54/install/include
@@ -329,17 +329,6 @@ jobs:
           ls -lah /d/dist/bin/*.dll 2>/dev/null | head -30
           echo "Import libraries:"
           ls -lah /d/dist/bin/*.a 2>/dev/null | head -10
-
-          echo "Renaming DLLs to remove version suffix..."
-          cd /d/dist/bin
-          for dll in *lua54.dll; do
-            newname="${dll//54/}"
-            cp -v "$dll" "$newname"
-          done
-          for a in *lua54.a; do
-            newname="${a//54/}"
-            cp -v "$a" "$newname"
-          done
 
           # Create tar.gz in GitHub workspace
           cd $GITHUB_WORKSPACE
