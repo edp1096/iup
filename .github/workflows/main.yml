@@ -35,6 +35,17 @@ jobs:
             sed
             mingw-w64-x86_64-fftw
             mingw-w64-x86_64-jasper
+            mingw-w64-x86_64-lua  # <-- 이거 추가
+
+      - name: Setup Lua paths
+        run: |
+          mkdir -p /d/build/lua54/install/{bin,lib,include}
+          cp /mingw64/bin/lua*.exe /d/build/lua54/install/bin/
+          cp /mingw64/bin/lua*.dll /d/build/lua54/install/bin/
+          cp /mingw64/lib/liblua*.a /d/build/lua54/install/lib/
+          cp /mingw64/include/lua*.h /d/build/lua54/install/include/
+          ls -la /d/build/lua54/install/bin/
+          ls -la /d/build/lua54/install/lib/
 
       - name: Create build directory
         run: |
@@ -86,15 +97,6 @@ jobs:
             -e 's|\$\(TEC_TOOLCHAIN\)ranlib|ranlib|g' \
             {} \;
           echo "Tecmake files patched for MSYS2"
-
-      - name: Build Lua
-        run: |
-          cd /d/build/lua54
-          make PLAT=mingw
-          make PLAT=mingw INSTALL_TOP=/d/build/lua54/install install
-          cd install/lib
-          cp liblua.a liblua54.a
-          cd /d/build
 
       - name: Build zlib
         run: |
@@ -149,6 +151,7 @@ jobs:
           export TECTOOLS_HOME=/d/build
           export LUA_INC=/d/build/lua54/install/include
           export LUA_LIB=/d/build/lua54/install/lib
+          export LUA_BIN=/d/build/lua54/install/bin
 
           # Build core IM libraries
           cd /d/build/im/src
@@ -185,6 +188,7 @@ jobs:
           export TECTOOLS_HOME=/d/build
           export LUA_INC=/d/build/lua54/install/include
           export LUA_LIB=/d/build/lua54/install/lib
+          export LUA_BIN=/d/build/lua54/install/bin
           export FLAGS="-Wno-error=incompatible-pointer-types"
 
           cd /d/build/cd/src
@@ -220,6 +224,7 @@ jobs:
           export TECTOOLS_HOME=/d/build
           export LUA_INC=/d/build/lua54/install/include
           export LUA_LIB=/d/build/lua54/install/lib
+          export LUA_BIN=/d/build/lua54/install/bin
           export FLAGS="-Wno-error=incompatible-pointer-types"
           cd /d/build/iup
           make iup iupcd iupcontrols iupgl iupglcontrols iup_plot iup_scintilla iupim iupimglib iupole
