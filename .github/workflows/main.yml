@@ -140,13 +140,16 @@ jobs:
           cd /d/build/im/src
           make -k
           EXIT_CODE=$?
-          if [ ! -f ../lib/mingw4_64/libim.a ]; then
+          cd /d/build/im
+          if [ ! -f lib/mingw4_64/libim.a ]; then
             echo "ERROR: Core IM library failed to build"
             exit 1
           fi
+          echo "Core IM library built successfully"
           if [ $EXIT_CODE -ne 0 ]; then
             echo "Warning: Some optional IM modules failed (expected for wmv/capture)"
           fi
+          cd src
           if [ -d lua5W ]; then
             cd lua5W
             make
