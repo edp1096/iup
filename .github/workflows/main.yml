@@ -263,8 +263,12 @@ jobs:
           # Build core IUP libraries
           make iup iupcd iupcontrols iupgl iupglcontrols iup_plot iup_scintilla iupim iupimglib iupole
           
+          # Build iupstub
+          cd src
+          make iupstub
+          
           # Build Lua bindings
-          cd srclua5
+          cd ../srclua5
           make -k || true
           
           # Build iuplua console
@@ -276,13 +280,7 @@ jobs:
             exit 1
           fi
           
-          echo "=== Checking executables ==="
           find . -name "*.exe"
-          
-          ls ../lib/dllw4_64
-          ls ..
-          pwd
-
           cd /d/build
 
       - name: Verify Build Results
