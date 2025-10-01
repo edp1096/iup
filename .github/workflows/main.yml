@@ -187,7 +187,7 @@ jobs:
 
       - name: Build IUP
         run: |
-          export TEC_UNAME=dllw4_64
+          export TEC_UNAME=mingw4_64
           export TEC_TOOLCHAIN=""
           export USE_LUA_VERSION=54
           export NO_DEPEND=Yes
@@ -196,16 +196,8 @@ jobs:
           export LUA_LIB=/d/build/lua54/install/lib
           export FLAGS="-Wno-error=incompatible-pointer-types"
           cd /d/build/iup
-          make -k
-          EXIT_CODE=$?
-          if [ ! -f lib/dllw4_64/iup.dll ]; then
-            echo "ERROR: Core IUP DLL failed to build"
-            exit 1
-          fi
-          echo "Core IUP DLL built successfully"
-          if [ $EXIT_CODE -ne 0 ]; then
-            echo "Warning: Some optional IUP executables failed"
-          fi
+          # Build only libraries, skip example applications
+          make iup iupole iupim iupimglib iuplua54 iupluaim54
           cd ..
 
       - name: Verify Build Results
