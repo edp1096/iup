@@ -238,6 +238,10 @@ jobs:
             exit 1
           fi
 
+          ls ../lib/dllw4_64
+          ls ..
+          pwd
+
           echo "CD Lua bindings built successfully"
           cd /d/build
 
@@ -261,6 +265,11 @@ jobs:
             echo "ERROR: Core IUP DLL failed"
             exit 1
           fi
+          
+          ls ../lib/dllw4_64
+          ls ..
+          pwd
+
           echo "IUP build successful"
           cd /d/build
 
@@ -348,7 +357,8 @@ jobs:
             DLLs and import libraries (.a) are in the bin/ directory
             Headers are in the include/ directory
 
-            Note: Excluded modules - im_wmv, im_capture, im_avi, im_fftw3
+            # Note: Excluded modules - im_wmv, im_capture, im_avi, im_fftw3
+            Note: Excluded modules - im_wmv, im_capture, im_fftw3
 
             Built with MinGW-w64 on MSYS2
             Build number: ${{ env.PADDED_BUILD }}
