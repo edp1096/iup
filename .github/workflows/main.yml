@@ -42,28 +42,20 @@ jobs:
       - name: Download Lua source
         run: |
           cd /d/build
-          wget --user-agent="Wget" -O lua-${{ env.LUA_VERSION }}.tar.gz \
-            https://www.lua.org/ftp/lua-${{ env.LUA_VERSION }}.tar.gz
+          wget --user-agent="Wget" -O lua-${{ env.LUA_VERSION }}.tar.gz https://www.lua.org/ftp/lua-${{ env.LUA_VERSION }}.tar.gz
           tar -xzf lua-${{ env.LUA_VERSION }}.tar.gz
           mv lua-${{ env.LUA_VERSION }} lua54
 
       - name: Download IUP dependencies from SourceForge
         run: |
           cd /d/build
-          wget --user-agent="Wget" -O zlib.tar.gz \
-            "https://sourceforge.net/projects/iup/files/${{ env.IUP_VERSION }}/Docs%20and%20Sources/zlib-1.2.11_Sources.tar.gz/download"
-          wget --user-agent="Wget" -O freetype.tar.gz \
-            "https://sourceforge.net/projects/iup/files/${{ env.IUP_VERSION }}/Docs%20and%20Sources/freetype-2.10.2_Sources.tar.gz/download"
-          wget --user-agent="Wget" -O ftgl.tar.gz \
-            "https://sourceforge.net/projects/iup/files/${{ env.IUP_VERSION }}/Docs%20and%20Sources/ftgl-2.1.5_Sources.tar.gz/download"
-          wget --user-agent="Wget" -O pdflib_lite.tar.gz \
-            "https://sourceforge.net/projects/canvasdraw/files/${{ env.CD_VERSION }}/Docs%20and%20Sources/pdflib_lite-7.0.5_Sources.tar.gz/download"
-          wget --user-agent="Wget" -O im.tar.gz \
-            "https://sourceforge.net/projects/imtoolkit/files/${{ env.IM_VERSION }}/Docs%20and%20Sources/im-${{ env.IM_VERSION }}_Sources.tar.gz/download"
-          wget --user-agent="Wget" -O cd.tar.gz \
-            "https://sourceforge.net/projects/canvasdraw/files/${{ env.CD_VERSION }}/Docs%20and%20Sources/cd-${{ env.CD_VERSION }}_Sources.tar.gz/download"
-          wget --user-agent="Wget" -O iup.tar.gz \
-            "https://sourceforge.net/projects/iup/files/${{ env.IUP_VERSION }}/Docs%20and%20Sources/iup-${{ env.IUP_VERSION }}_Sources.tar.gz/download"
+          wget --user-agent="Wget" -O zlib.tar.gz "https://sourceforge.net/projects/iup/files/${{ env.IUP_VERSION }}/Docs%20and%20Sources/zlib-1.2.11_Sources.tar.gz/download"
+          wget --user-agent="Wget" -O freetype.tar.gz "https://sourceforge.net/projects/iup/files/${{ env.IUP_VERSION }}/Docs%20and%20Sources/freetype-2.10.2_Sources.tar.gz/download"
+          wget --user-agent="Wget" -O ftgl.tar.gz "https://sourceforge.net/projects/iup/files/${{ env.IUP_VERSION }}/Docs%20and%20Sources/ftgl-2.1.5_Sources.tar.gz/download"
+          wget --user-agent="Wget" -O pdflib_lite.tar.gz "https://sourceforge.net/projects/canvasdraw/files/${{ env.CD_VERSION }}/Docs%20and%20Sources/pdflib_lite-7.0.5_Sources.tar.gz/download"
+          wget --user-agent="Wget" -O im.tar.gz "https://sourceforge.net/projects/imtoolkit/files/${{ env.IM_VERSION }}/Docs%20and%20Sources/im-${{ env.IM_VERSION }}_Sources.tar.gz/download"
+          wget --user-agent="Wget" -O cd.tar.gz "https://sourceforge.net/projects/canvasdraw/files/${{ env.CD_VERSION }}/Docs%20and%20Sources/cd-${{ env.CD_VERSION }}_Sources.tar.gz/download"
+          wget --user-agent="Wget" -O iup.tar.gz "https://sourceforge.net/projects/iup/files/${{ env.IUP_VERSION }}/Docs%20and%20Sources/iup-${{ env.IUP_VERSION }}_Sources.tar.gz/download"
 
       - name: Extract all sources
         run: |
@@ -137,6 +129,8 @@ jobs:
           export TECTOOLS_HOME=/d/build
           export LUA_INC=/d/build/lua54/install/include
           export LUA_LIB=/d/build/lua54/install/lib
+          
+          # Build core IM libraries
           cd /d/build/im/src
           make im im_process im_jp2
           if [ ! -f ../lib/dllw4_64/im.dll ]; then
@@ -144,12 +138,39 @@ jobs:
             exit 1
           fi
           echo "Core IM DLL built successfully"
-          if [ -d lua5 ]; then
-            cd lua5
-            make imlua5 imlua_process5 imlua_jp25
+          
+          # Find and build Lua bindings
+          echo "=== Searching for Lua binding directories ==="
+          find /d/build/im -type d -name "*lua*" 2>/dev/null
+          
+          # Check available make targets in srclua5
+          if [ -d /d/build/im/srclua5 ]; then
+            echo "=== Found srclua5 directory ==="
+            cd /d/build/im/srclua5
+            echo "Available targets:"
+            make -qp 2>/dev/null | grep -E '^[a-zA-Z_-]+:' | grep -v '^\.' | cut -d: -f1 | sort -u
+            
+            # Try to build Lua bindings with correct targets
+            make || {
+              echo "ERROR: Lua bindings build failed in srclua5"
+              exit 1
+            }
+          elif [ -d /d/build/im/src/lua5 ]; then
+            echo "=== Found src/lua5 directory ==="
+            cd /d/build/im/src/lua5
+            echo "Available targets:"
+            make -qp 2>/dev/null | grep -E '^[a-zA-Z_-]+:' | grep -v '^\.' | cut -d: -f1 | sort -u
+            
+            make || {
+              echo "ERROR: Lua bindings build failed in src/lua5"
+              exit 1
+            }
           else
-            make imlua5 imlua_process5 imlua_jp25 || echo "Lua bindings not built"
+            echo "ERROR: No Lua binding directory found"
+            find /d/build/im -type f -name "Makefile" | xargs grep -l "lua"
+            exit 1
           fi
+          
           cd /d/build
 
       - name: Build pdflib_lite
