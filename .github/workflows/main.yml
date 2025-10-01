@@ -40,10 +40,36 @@ jobs:
       - name: Setup Lua paths
         run: |
           mkdir -p /d/build/lua54/install/{bin,lib,include}
-          cp /mingw64/bin/lua*.exe /d/build/lua54/install/bin/
-          cp /mingw64/bin/lua*.dll /d/build/lua54/install/bin/
-          cp /mingw64/lib/liblua*.a /d/build/lua54/install/lib/
+          
+          # Check what's actually installed
+          echo "=== Checking MSYS2 Lua files ==="
+          ls -la /mingw64/bin/lua* || true
+          ls -la /mingw64/lib/liblua* || true
+          
+          # Copy executables
+          cp /mingw64/bin/lua.exe /d/build/lua54/install/bin/ 2>/dev/null || cp /mingw64/bin/lua54.exe /d/build/lua54/install/bin/lua.exe
+          cp /mingw64/bin/luac.exe /d/build/lua54/install/bin/ 2>/dev/null || cp /mingw64/bin/luac54.exe /d/build/lua54/install/bin/luac.exe
+          
+          # Copy DLL with proper naming
+          if [ -f /mingw64/bin/lua54.dll ]; then
+            cp /mingw64/bin/lua54.dll /d/build/lua54/install/bin/
+          elif [ -f /mingw64/bin/lua5.4.dll ]; then
+            cp /mingw64/bin/lua5.4.dll /d/build/lua54/install/bin/lua54.dll
+          elif [ -f /mingw64/bin/liblua.dll ]; then
+            cp /mingw64/bin/liblua.dll /d/build/lua54/install/bin/lua54.dll
+          fi
+          
+          # Copy import library with proper naming
+          if [ -f /mingw64/lib/liblua.dll.a ]; then
+            cp /mingw64/lib/liblua.dll.a /d/build/lua54/install/lib/liblua54.a
+          elif [ -f /mingw64/lib/liblua.a ]; then
+            cp /mingw64/lib/liblua.a /d/build/lua54/install/lib/liblua54.a
+          fi
+          
+          # Copy headers
           cp /mingw64/include/lua*.h /d/build/lua54/install/include/
+          
+          echo "=== Copied Lua files ==="
           ls -la /d/build/lua54/install/bin/
           ls -la /d/build/lua54/install/lib/
 
