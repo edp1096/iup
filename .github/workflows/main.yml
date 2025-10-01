@@ -138,7 +138,7 @@ jobs:
           export LUA_INC=/d/build/lua54/install/include
           export LUA_LIB=/d/build/lua54/install/lib
           cd /d/build/im/src
-          make -k || true
+          make -k
           if [ -d lua5W ]; then
             cd lua5W
             make
@@ -150,14 +150,7 @@ jobs:
           export TEC_UNAME=mingw4_64
           export TEC_TOOLCHAIN=""
           export NO_DEPEND=Yes
-          if [ -d /d/build/pdflib_lite-7.0.5/pdflib7/src ]; then
-            cd /d/build/pdflib_lite-7.0.5/pdflib7/src
-          elif [ -d /d/build/pdflib_lite/src ]; then
-            cd /d/build/pdflib_lite/src
-          else
-            echo "pdflib_lite src not found, skipping"
-            exit 0
-          fi
+          cd /d/build/pdflib7/src
           make
           cd /d/build
 
@@ -194,8 +187,20 @@ jobs:
           export LUA_LIB=/d/build/lua54/install/lib
           export FLAGS="-Wno-error=incompatible-pointer-types"
           cd /d/build/iup
-          make -k || true
+          make -k
           cd ..
+
+      - name: Verify Build Results
+        run: |
+          echo "=== Checking built libraries ==="
+          echo "--- IUP libs ---"
+          find /d/build/iup/lib -name "*.a" 2>/dev/null || echo "No IUP static libs"
+          echo "--- CD libs ---"
+          find /d/build/cd/lib -name "*.a" 2>/dev/null || echo "No CD static libs"
+          echo "--- IM libs ---"
+          find /d/build/im/lib -name "*.a" 2>/dev/null || echo "No IM static libs"
+          echo "--- pdflib libs ---"
+          find /d/build/pdflib7/lib -name "*.a" 2>/dev/null || echo "No pdflib static libs"
 
       - name: Set padded build number
         run: |
@@ -204,19 +209,31 @@ jobs:
       - name: Package Results
         run: |
           mkdir -p /d/dist/{lib,include,bin}
+          
+          echo "Copying Lua..."
           cp -r /d/build/lua54/install/* /d/dist/
-          find /d/build/iup/lib -name "*.a" -o -name "*.dll" | xargs -I {} cp {} /d/dist/lib/ 2>/dev/null || true
-          find /d/build/cd/lib -name "*.a" -o -name "*.dll" | xargs -I {} cp {} /d/dist/lib/ 2>/dev/null || true
-          find /d/build/im/lib -name "*.a" -o -name "*.dll" | xargs -I {} cp {} /d/dist/lib/ 2>/dev/null || true
-          if [ -d /d/build/pdflib_lite-7.0.5/pdflib7/lib ]; then
-            find /d/build/pdflib_lite-7.0.5/pdflib7/lib -name "*.a" -o -name "*.dll" | xargs -I {} cp {} /d/dist/lib/ 2>/dev/null || true
-          fi
+          
+          echo "Copying IUP libraries..."
+          find /d/build/iup/lib -type f \( -name "*.a" -o -name "*.dll" \) -exec cp -v {} /d/dist/lib/ \;
+          
+          echo "Copying CD libraries..."
+          find /d/build/cd/lib -type f \( -name "*.a" -o -name "*.dll" \) -exec cp -v {} /d/dist/lib/ \;
+          
+          echo "Copying IM libraries..."
+          find /d/build/im/lib -type f \( -name "*.a" -o -name "*.dll" \) -exec cp -v {} /d/dist/lib/ \;
+          
+          echo "Copying pdflib libraries..."
+          find /d/build/pdflib7/lib -type f \( -name "*.a" -o -name "*.dll" \) -exec cp -v {} /d/dist/lib/ \; 2>/dev/null || true
+          
+          echo "Copying headers..."
           cp -r /d/build/iup/include/* /d/dist/include/ 2>/dev/null || true
           cp -r /d/build/cd/include/* /d/dist/include/ 2>/dev/null || true
           cp -r /d/build/im/include/* /d/dist/include/ 2>/dev/null || true
-          if [ -d /d/build/pdflib_lite-7.0.5/pdflib7/include ]; then
-            cp -r /d/build/pdflib_lite-7.0.5/pdflib7/include/* /d/dist/include/ 2>/dev/null || true
-          fi
+          cp -r /d/build/pdflib7/include/* /d/dist/include/ 2>/dev/null || true
+          
+          echo "=== Package contents ==="
+          ls -lah /d/dist/lib/ | head -20
+          
           cd /d
           tar -czf iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64.tar.gz dist/
 
