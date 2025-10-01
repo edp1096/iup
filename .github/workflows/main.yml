@@ -138,31 +138,16 @@ jobs:
           fi
           echo "Core IM DLL built successfully"
           
-          # Build Lua bindings - check the correct directory
-          if [ -d /d/build/im/srclua5 ]; then
-            echo "=== Building Lua bindings in srclua5 ==="
-            cd /d/build/im/srclua5
-            make
-            
-            if [ $? -ne 0 ]; then
-              echo "ERROR: Lua bindings build failed"
-              exit 1
-            fi
-          elif [ -d /d/build/im/src/lua5 ]; then
-            echo "=== Building Lua bindings in src/lua5 ==="
-            cd /d/build/im/src/lua5
-            make
-            
-            if [ $? -ne 0 ]; then
-              echo "ERROR: Lua bindings build failed"
-              exit 1
-            fi
-          else
-            echo "ERROR: Lua binding directory not found"
-            ls -la /d/build/im/
+          # Build Lua bindings
+          echo "=== Building Lua bindings ==="
+          make imlua5 imlua_process5 imlua_jp25
+          
+          if [ $? -ne 0 ]; then
+            echo "ERROR: Lua bindings build failed"
             exit 1
           fi
           
+          echo "IM Lua bindings built successfully"
           cd /d/build
 
       - name: Build CD
