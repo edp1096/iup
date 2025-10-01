@@ -266,23 +266,22 @@ jobs:
           cd srclua5
           make -k || true
           
-          # Build iuplua executable
-          cd ../bin/Console
-          make
-          
+          # Build iuplua console executable
           cd /d/build/iup
+          make iupluaconsole
+          
           if [ ! -f lib/dllw4_64/iup.dll ]; then
             echo "ERROR: Core IUP DLL failed"
             exit 1
           fi
           
-          echo "Checking iuplua executable..."
-          find bin -name "iuplua*.exe" 2>/dev/null
-
+          echo "=== Checking for iupluaconsole executable ==="
+          find . -name "*console*.exe" -o -name "iuplua*.exe"
+          
           ls ../lib/dllw4_64
           ls ..
           pwd
-          
+
           echo "IUP build successful"
           cd /d/build
 
@@ -308,7 +307,7 @@ jobs:
           cp -r /d/build/lua54/install/* /d/dist/
 
           echo "Copying IUP executables (iuplua)..."
-          find /d/build/iup/bin -name "iuplua*.exe" -exec cp -v {} /d/dist/bin/ \;
+          find /d/build/iup -name "*console*.exe" -exec cp -v {} /d/dist/bin/ \;
 
           echo "Copying IUP DLLs and import libraries..."
           find /d/build/iup/lib/dllw4_64 -type f \( -name "*.dll" -o -name "*.a" \) -exec cp -v {} /d/dist/bin/ \;
