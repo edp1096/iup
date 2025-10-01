@@ -181,7 +181,8 @@ jobs:
 
           # Build core IM libraries
           cd /d/build/im/src
-          make im im_process im_jp2 im_avi imlua5 imlua_process5 imlua_jp25
+          # make im im_process im_jp2 im_avi5 imlua5 imlua_process5 imlua_jp25
+          make im im_process im_avi5 imlua5 imlua_process5 imlua_jp25
 
           if [ ! -f ../lib/dllw4_64/im.dll ]; then
             echo "ERROR: Core IM DLL failed to build"
@@ -247,7 +248,7 @@ jobs:
 
       - name: Build IUP
         run: |
-          export TEC_UNAME=dllw4_64  # mingw4_64 → dllw4_64
+          export TEC_UNAME=dllw4_64
           export TEC_TOOLCHAIN=""
           export USE_LUA_VERSION=54
           export NO_DEPEND=Yes
@@ -256,20 +257,32 @@ jobs:
           export LUA_LIB=/d/build/lua54/install/lib
           export LUA_BIN=/d/build/lua54/install/bin
           export FLAGS="-Wno-error=incompatible-pointer-types"
+          
+          # Build core IUP libraries
           cd /d/build/iup
           make iup iupcd iupcontrols iupgl iupglcontrols iup_plot iup_scintilla iupim iupimglib iupole
+          
+          # Build Lua bindings
           cd srclua5
           make -k || true
+          
+          # Build iuplua executable
+          cd ../bin/Console
+          make
+          
           cd /d/build/iup
-          if [ ! -f lib/dllw4_64/iup.dll ]; then  # 경로 및 파일 수정
+          if [ ! -f lib/dllw4_64/iup.dll ]; then
             echo "ERROR: Core IUP DLL failed"
             exit 1
           fi
           
+          echo "Checking iuplua executable..."
+          find bin -name "iuplua*.exe" 2>/dev/null
+
           ls ../lib/dllw4_64
           ls ..
           pwd
-
+          
           echo "IUP build successful"
           cd /d/build
 
@@ -294,6 +307,9 @@ jobs:
           echo "Copying Lua..."
           cp -r /d/build/lua54/install/* /d/dist/
 
+          echo "Copying IUP executables (iuplua)..."
+          find /d/build/iup/bin -name "iuplua*.exe" -exec cp -v {} /d/dist/bin/ \;
+
           echo "Copying IUP DLLs and import libraries..."
           find /d/build/iup/lib/dllw4_64 -type f \( -name "*.dll" -o -name "*.a" \) -exec cp -v {} /d/dist/bin/ \;
 
@@ -309,6 +325,8 @@ jobs:
           cp -r /d/build/im/include/* /d/dist/include/ 2>/dev/null || true
 
           echo "=== Package contents ==="
+          echo "Executables:"
+          ls -lah /d/dist/bin/*.exe 2>/dev/null
           echo "DLLs:"
           ls -lah /d/dist/bin/*.dll 2>/dev/null | head -30
           echo "Import libraries:"
@@ -330,18 +348,6 @@ jobs:
         with:
           files: iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64-dll.tar.gz
           tag_name: ${{ env.IUP_VERSION }}-build-${{ env.PADDED_BUILD }}
-
-      - name: Upload Build
-        uses: actions/upload-artifact@v4
-        with:
-          name: iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64-dll
-          path: /d/iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64-dll.tar.gz
-
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: /d/iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64-dll.tar.gz
-          tag_name: ${{ env.IUP_VERSION }}-build-${{ env.PADDED_BUILD }}
           name: IUP/CD/IM ${{ env.IUP_VERSION }} Build ${{ env.PADDED_BUILD }} (DLL)
           body: |
             Automated build of IUP/CD/IM ${{ env.IUP_VERSION }} with Lua ${{ env.LUA_VERSION }} for Windows x64 (DLL version)
@@ -349,16 +355,14 @@ jobs:
             Includes:
             - IUP ${{ env.IUP_VERSION }} (DLL)
             - CD ${{ env.CD_VERSION }} (DLL)
-            - IM ${{ env.IM_VERSION }} (DLL) - core, process, jp2
+            - IM ${{ env.IM_VERSION }} (DLL)
             - Lua ${{ env.LUA_VERSION }}
+            - iuplua.exe (Lua interpreter with IUP)
             - All dependencies (zlib, freetype, ftgl)
             - Lua bindings for IUP, CD, IM
 
-            DLLs and import libraries (.a) are in the bin/ directory
+            Executables and DLLs are in the bin/ directory
             Headers are in the include/ directory
-
-            # Note: Excluded modules - im_wmv, im_capture, im_avi, im_fftw3
-            Note: Excluded modules - im_wmv, im_capture, im_fftw3
 
             Built with MinGW-w64 on MSYS2
             Build number: ${{ env.PADDED_BUILD }}
