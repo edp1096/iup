@@ -52,7 +52,6 @@ jobs:
           wget --user-agent="Wget" -O zlib.tar.gz "https://sourceforge.net/projects/iup/files/${{ env.IUP_VERSION }}/Docs%20and%20Sources/zlib-1.2.11_Sources.tar.gz/download"
           wget --user-agent="Wget" -O freetype.tar.gz "https://sourceforge.net/projects/iup/files/${{ env.IUP_VERSION }}/Docs%20and%20Sources/freetype-2.10.2_Sources.tar.gz/download"
           wget --user-agent="Wget" -O ftgl.tar.gz "https://sourceforge.net/projects/iup/files/${{ env.IUP_VERSION }}/Docs%20and%20Sources/ftgl-2.1.5_Sources.tar.gz/download"
-          wget --user-agent="Wget" -O pdflib_lite.tar.gz "https://sourceforge.net/projects/canvasdraw/files/${{ env.CD_VERSION }}/Docs%20and%20Sources/pdflib_lite-7.0.5_Sources.tar.gz/download"
           wget --user-agent="Wget" -O im.tar.gz "https://sourceforge.net/projects/imtoolkit/files/${{ env.IM_VERSION }}/Docs%20and%20Sources/im-${{ env.IM_VERSION }}_Sources.tar.gz/download"
           wget --user-agent="Wget" -O cd.tar.gz "https://sourceforge.net/projects/canvasdraw/files/${{ env.CD_VERSION }}/Docs%20and%20Sources/cd-${{ env.CD_VERSION }}_Sources.tar.gz/download"
           wget --user-agent="Wget" -O iup.tar.gz "https://sourceforge.net/projects/iup/files/${{ env.IUP_VERSION }}/Docs%20and%20Sources/iup-${{ env.IUP_VERSION }}_Sources.tar.gz/download"
@@ -63,7 +62,6 @@ jobs:
           tar -xzf zlib.tar.gz
           tar -xzf freetype.tar.gz
           tar -xzf ftgl.tar.gz
-          tar -xzf pdflib_lite.tar.gz
           tar -xzf im.tar.gz
           tar -xzf cd.tar.gz
           tar -xzf iup.tar.gz
@@ -133,53 +131,38 @@ jobs:
           # Build core IM libraries
           cd /d/build/im/src
           make im im_process im_jp2
+          
           if [ ! -f ../lib/dllw4_64/im.dll ]; then
             echo "ERROR: Core IM DLL failed to build"
             exit 1
           fi
           echo "Core IM DLL built successfully"
           
-          # Find and build Lua bindings
-          echo "=== Searching for Lua binding directories ==="
-          find /d/build/im -type d -name "*lua*" 2>/dev/null
-          
-          # Check available make targets in srclua5
+          # Build Lua bindings - check the correct directory
           if [ -d /d/build/im/srclua5 ]; then
-            echo "=== Found srclua5 directory ==="
+            echo "=== Building Lua bindings in srclua5 ==="
             cd /d/build/im/srclua5
-            echo "Available targets:"
-            make -qp 2>/dev/null | grep -E '^[a-zA-Z_-]+:' | grep -v '^\.' | cut -d: -f1 | sort -u
+            make
             
-            # Try to build Lua bindings with correct targets
-            make || {
-              echo "ERROR: Lua bindings build failed in srclua5"
+            if [ $? -ne 0 ]; then
+              echo "ERROR: Lua bindings build failed"
               exit 1
-            }
+            fi
           elif [ -d /d/build/im/src/lua5 ]; then
-            echo "=== Found src/lua5 directory ==="
+            echo "=== Building Lua bindings in src/lua5 ==="
             cd /d/build/im/src/lua5
-            echo "Available targets:"
-            make -qp 2>/dev/null | grep -E '^[a-zA-Z_-]+:' | grep -v '^\.' | cut -d: -f1 | sort -u
+            make
             
-            make || {
-              echo "ERROR: Lua bindings build failed in src/lua5"
+            if [ $? -ne 0 ]; then
+              echo "ERROR: Lua bindings build failed"
               exit 1
-            }
+            fi
           else
-            echo "ERROR: No Lua binding directory found"
-            find /d/build/im -type f -name "Makefile" | xargs grep -l "lua"
+            echo "ERROR: Lua binding directory not found"
+            ls -la /d/build/im/
             exit 1
           fi
           
-          cd /d/build
-
-      - name: Build pdflib_lite
-        run: |
-          export TEC_UNAME=dllw4_64
-          export TEC_TOOLCHAIN=""
-          export NO_DEPEND=Yes
-          cd /d/build/pdflib7/src
-          make
           cd /d/build
 
       - name: Build CD
@@ -257,14 +240,10 @@ jobs:
           echo "Copying IM DLLs and import libraries..."
           find /d/build/im/lib/dllw4_64 -type f \( -name "*.dll" -o -name "*.a" \) -exec cp -v {} /d/dist/bin/ \;
           
-          echo "Copying pdflib DLLs..."
-          find /d/build/pdflib7/lib/dllw4_64 -type f \( -name "*.dll" -o -name "*.a" \) -exec cp -v {} /d/dist/bin/ \; 2>/dev/null || true
-          
           echo "Copying headers..."
           cp -r /d/build/iup/include/* /d/dist/include/ 2>/dev/null || true
           cp -r /d/build/cd/include/* /d/dist/include/ 2>/dev/null || true
           cp -r /d/build/im/include/* /d/dist/include/ 2>/dev/null || true
-          cp -r /d/build/pdflib7/include/* /d/dist/include/ 2>/dev/null || true
           
           echo "=== Package contents ==="
           echo "DLLs:"
@@ -295,7 +274,7 @@ jobs:
             - CD ${{ env.CD_VERSION }} (DLL)
             - IM ${{ env.IM_VERSION }} (DLL) - core, process, jp2
             - Lua ${{ env.LUA_VERSION }}
-            - All dependencies (zlib, freetype, ftgl, pdflib_lite)
+            - All dependencies (zlib, freetype, ftgl)
             - Lua bindings for IUP, CD, IM
 
             DLLs and import libraries (.a) are in the bin/ directory
