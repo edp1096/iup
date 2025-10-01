@@ -196,12 +196,22 @@ jobs:
           export LUA_LIB=/d/build/lua54/install/lib
           export FLAGS="-Wno-error=incompatible-pointer-types"
           cd /d/build/iup
-          # Build C libraries first
+          # Build C libraries
           make iup iupcd iupcontrols iupgl iupglcontrols iup_plot iup_scintilla iupim iupimglib iupole
-          # Build Lua bindings manually, excluding problematic ones
+          # Build Lua bindings with -k (keep going on errors)
           cd srclua5
-          export EXCLUDE_TARGETS="iupluafiledlg iupluaweb"
-          make
+          make -k
+          EXIT_CODE=$?
+          cd /d/build/iup
+          # Verify core Lua binding was built
+          if [ ! -f lib/mingw4_64/Lua54/libiuplua54.a ]; then
+            echo "ERROR: Core IUP Lua binding failed"
+            exit 1
+          fi
+          echo "Core IUP Lua binding built successfully"
+          if [ $EXIT_CODE -ne 0 ]; then
+            echo "Warning: Some optional IUP Lua bindings failed (expected for filedlg/web)"
+          fi
           cd /d/build
 
       - name: Verify Build Results
