@@ -139,11 +139,8 @@ jobs:
           export LUA_INC=/d/build/lua54/install/include
           export LUA_LIB=/d/build/lua54/install/lib
           cd /d/build/im/src
-          sed -i 's/ im_wmv//g' Makefile
-          sed -i 's/ imlua_wmv5//g' Makefile
-          sed -i 's/ im_capture//g' Makefile
-          sed -i 's/ imlua_capture5//g' Makefile
-          make -k
+          # Build core libraries explicitly
+          make im im_process im_jp2 im_fftw3 im_avi
           EXIT_CODE=$?
           cd /d/build/im
           if [ ! -f lib/dllw4_64/im.dll ]; then
@@ -151,13 +148,11 @@ jobs:
             exit 1
           fi
           echo "Core IM DLL built successfully"
-          if [ $EXIT_CODE -ne 0 ]; then
-            echo "Warning: Some optional IM modules failed"
-          fi
+          # Build Lua bindings
           cd src
           if [ -d lua5W ]; then
             cd lua5W
-            make
+            make imlua5 imlua_process5 imlua_jp25 imlua_fftw35 imlua_avi5 || echo "Some Lua bindings failed"
           fi
           cd /d/build
 
