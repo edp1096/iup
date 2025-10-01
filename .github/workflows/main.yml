@@ -263,11 +263,15 @@ jobs:
           # Build core IUP libraries
           make iup iupcd iupcontrols iupgl iupglcontrols iup_plot iup_scintilla iupim iupimglib iupole
           
-          # Patch iupstub.mak to remove USE_DLL
-          sed -i '/USE_DLL = Yes/d' src/iupstub.mak
+          # Build iupstub as static library with mingw4_64
+          cd src
+          TEC_UNAME=mingw4_64 make -f iupstub.mak
           
-          # Build iupstub as static library
-          make -C src -f iupstub.mak
+          # Move to dllw4_64 directory
+          mkdir -p ../lib/dllw4_64
+          mv ../lib/mingw4_64/libiupstub.a ../lib/dllw4_64/
+          
+          cd /d/build/iup
           
           # Build Lua bindings
           make -C srclua5 -k || true
