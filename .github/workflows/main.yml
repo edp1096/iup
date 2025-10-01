@@ -33,6 +33,7 @@ jobs:
             tar
             wget
             sed
+            mingw-w64-x86_64-fftw
 
       - name: Create build directory
         run: |
@@ -187,7 +188,7 @@ jobs:
 
       - name: Build IUP
         run: |
-          export TEC_UNAME=mingw4_64
+          export TEC_UNAME=dllw4_64  # mingw4_64 → dllw4_64
           export TEC_TOOLCHAIN=""
           export USE_LUA_VERSION=54
           export NO_DEPEND=Yes
@@ -200,8 +201,8 @@ jobs:
           cd srclua5
           make -k || true
           cd /d/build/iup
-          if [ ! -f lib/mingw4_64/Lua54/libiuplua54.a ]; then
-            echo "ERROR: Core IUP Lua binding failed"
+          if [ ! -f lib/dllw4_64/iup.dll ]; then  # 경로 및 파일 수정
+            echo "ERROR: Core IUP DLL failed"
             exit 1
           fi
           echo "IUP build successful"
