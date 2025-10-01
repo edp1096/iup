@@ -96,6 +96,9 @@ jobs:
           cd /d/build/im/src
           sed -i 's/-llibfftw3f-3/-lfftw3f/g' im_fftw3.mak
           sed -i 's/-llibfftw3-3/-lfftw3/g' im_fftw3.mak
+          sed -i 's|/d/build/fftw3/lib/Win64|/mingw64/lib|g' im_fftw3.mak
+          sed -i 's|/d/build/fftw3/include|/mingw64/include|g' im_fftw3.mak
+          echo "FFTW paths fixed"
 
       - name: Build Lua
         run: |
