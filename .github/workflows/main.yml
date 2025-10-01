@@ -195,7 +195,7 @@ jobs:
           export LUA_INC=/d/build/lua54/install/include
           export LUA_LIB=/d/build/lua54/install/lib
           export FLAGS="-Wno-error=incompatible-pointer-types"
-          export EXCLUDE_TARGETS="iupluaconsole iupluascripter ledc iupview iupvled"
+          export EXCLUDE_TARGETS="iupluaconsole iupluascripter ledc iupview iupvled iupfiledlg"
           cd /d/build/iup
           make
           cd ..
