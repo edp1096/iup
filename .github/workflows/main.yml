@@ -182,7 +182,7 @@ jobs:
           # Build core IM libraries
           cd /d/build/im/src
           # make im im_process im_jp2 im_avi
-          make im im_jp2 im_process im_process_omp
+          make im im_jp2 im_process im_process_omp im_avi
 
           if [ ! -f ../lib/dllw4_64/im.dll ]; then
             echo "ERROR: Core IM DLL failed to build"
@@ -192,7 +192,7 @@ jobs:
 
           # Build Lua bindings
           echo "=== Building Lua bindings ==="
-          make imlua5 imlua_process5 imlua_jp25 imlua_process_omp5
+          make imlua5 imlua_process5 imlua_jp25 imlua_process_omp5 im_avi5
 
           if [ $? -ne 0 ]; then
             echo "ERROR: Lua bindings build failed"
@@ -257,6 +257,10 @@ jobs:
           export LUA_LIB=/d/build/lua54/install/lib
           export LUA_BIN=/d/build/lua54/install/bin
           export FLAGS="-Wno-error=incompatible-pointer-types"
+
+          # Build iupstub first (needed for executables)
+          cd /d/build/iup/src
+          make -f iupstub.mak
           
           # Build core IUP libraries
           cd /d/build/iup
