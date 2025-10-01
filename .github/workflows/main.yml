@@ -95,7 +95,9 @@ jobs:
           cd /d/build/lua54
           make PLAT=mingw
           make PLAT=mingw INSTALL_TOP=/d/build/lua54/install install
-          cd ..
+          cd install/lib
+          cp liblua.a liblua54.a
+          cd /d/build
 
       - name: Build zlib
         run: |
@@ -192,6 +194,7 @@ jobs:
           export LUA_LIB=/d/build/lua54/install/lib
           export FLAGS="-Wno-error=incompatible-pointer-types"
           cd /d/build/iup
+          make iup iupstub iuplua54
           make -k || true
           cd ..
 
