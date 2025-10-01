@@ -144,8 +144,12 @@ jobs:
             exit 1
           fi
           echo "Core IM DLL built successfully"
-          cd lua5W
-          make imlua5 imlua_process5 imlua_jp25
+          if [ -d lua5 ]; then
+            cd lua5
+            make imlua5 imlua_process5 imlua_jp25
+          else
+            make imlua5 imlua_process5 imlua_jp25 || echo "Lua bindings not built"
+          fi
           cd /d/build
 
       - name: Build pdflib_lite
