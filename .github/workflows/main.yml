@@ -91,6 +91,12 @@ jobs:
             {} \;
           echo "Tecmake files patched for MSYS2"
 
+      - name: Patch IM FFTW linking
+        run: |
+          cd /d/build/im/src
+          sed -i 's/-llibfftw3f-3/-lfftw3f/g' im_fftw3.mak
+          sed -i 's/-llibfftw3-3/-lfftw3/g' im_fftw3.mak
+
       - name: Build Lua
         run: |
           cd /d/build/lua54
@@ -129,13 +135,6 @@ jobs:
           make
           cd ../..
 
-      - name: Patch IM FFTW linking
-        run: |
-          cd /d/build/im/src
-          # Fix FFTW library names in config
-          sed -i 's/-llibfftw3f-3/-lfftw3f/g' im_fftw3.mak
-          sed -i 's/-llibfftw3-3/-lfftw3/g' im_fftw3.mak
-
       - name: Build IM
         run: |
           export TEC_UNAME=dllw4_64
@@ -146,24 +145,14 @@ jobs:
           export LUA_INC=/d/build/lua54/install/include
           export LUA_LIB=/d/build/lua54/install/lib
           cd /d/build/im/src
-          # Remove unsupported modules
-          sed -i 's/ im_wmv//g' Makefile
-          sed -i 's/ imlua_wmv5//g' Makefile
-          sed -i 's/ im_capture//g' Makefile
-          sed -i 's/ imlua_capture5//g' Makefile
-          make -k
-          EXIT_CODE=$?
-          cd /d/build/im
-          if [ ! -f lib/dllw4_64/im.dll ]; then
+          make im im_process im_jp2 im_fftw3
+          if [ ! -f ../lib/dllw4_64/im.dll ]; then
             echo "ERROR: Core IM DLL failed to build"
             exit 1
           fi
           echo "Core IM DLL built successfully"
-          if [ $EXIT_CODE -ne 0 ]; then
-            echo "Warning: Some optional IM modules failed"
-          fi
-          cd src/lua5W
-          make || true
+          cd lua5W
+          make imlua5 imlua_process5 imlua_jp25 imlua_fftw35
           cd /d/build
 
       - name: Build pdflib_lite
@@ -224,11 +213,11 @@ jobs:
         run: |
           echo "=== Checking built libraries ==="
           echo "--- IUP DLLs ---"
-          find /d/build/iup/lib/dllw4_64 -name "*.dll" 2>/dev/null || echo "No IUP DLLs"
+          find /d/build/iup/lib/dllw4_64 -name "*.dll" 2>/dev/null | head -20
           echo "--- CD DLLs ---"
-          find /d/build/cd/lib/dllw4_64 -name "*.dll" 2>/dev/null || echo "No CD DLLs"
+          find /d/build/cd/lib/dllw4_64 -name "*.dll" 2>/dev/null | head -20
           echo "--- IM DLLs ---"
-          find /d/build/im/lib/dllw4_64 -name "*.dll" 2>/dev/null || echo "No IM DLLs"
+          find /d/build/im/lib/dllw4_64 -name "*.dll" 2>/dev/null | head -20
 
       - name: Set padded build number
         run: |
@@ -286,7 +275,7 @@ jobs:
             Includes:
             - IUP ${{ env.IUP_VERSION }} (DLL)
             - CD ${{ env.CD_VERSION }} (DLL)
-            - IM ${{ env.IM_VERSION }} (DLL)
+            - IM ${{ env.IM_VERSION }} (DLL) - core, process, jp2, fftw3
             - Lua ${{ env.LUA_VERSION }}
             - All dependencies (zlib, freetype, ftgl, fftw3, pdflib_lite)
             - Lua bindings for IUP, CD, IM
@@ -294,9 +283,7 @@ jobs:
             DLLs and import libraries (.a) are in the bin/ directory
             Headers are in the include/ directory
 
-            Note: Some optional modules skipped (not fully supported in MinGW):
-            - im_wmv, im_capture (Windows Media/DirectX)
-            - Optional executables (iuplua54.exe, etc.)
+            Note: Video-related modules excluded (im_wmv, im_capture, im_avi)
 
             Built with MinGW-w64 on MSYS2
             Build number: ${{ env.PADDED_BUILD }}
