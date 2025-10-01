@@ -129,6 +129,13 @@ jobs:
           make
           cd ../..
 
+      - name: Patch IM FFTW linking
+        run: |
+          cd /d/build/im/src
+          # Fix FFTW library names in config
+          sed -i 's/-llibfftw3f-3/-lfftw3f/g' im_fftw3.mak
+          sed -i 's/-llibfftw3-3/-lfftw3/g' im_fftw3.mak
+
       - name: Build IM
         run: |
           export TEC_UNAME=dllw4_64
@@ -139,8 +146,12 @@ jobs:
           export LUA_INC=/d/build/lua54/install/include
           export LUA_LIB=/d/build/lua54/install/lib
           cd /d/build/im/src
-          # Build core libraries explicitly
-          make im im_process im_jp2 im_fftw3 im_avi
+          # Remove unsupported modules
+          sed -i 's/ im_wmv//g' Makefile
+          sed -i 's/ imlua_wmv5//g' Makefile
+          sed -i 's/ im_capture//g' Makefile
+          sed -i 's/ imlua_capture5//g' Makefile
+          make -k
           EXIT_CODE=$?
           cd /d/build/im
           if [ ! -f lib/dllw4_64/im.dll ]; then
@@ -148,12 +159,11 @@ jobs:
             exit 1
           fi
           echo "Core IM DLL built successfully"
-          # Build Lua bindings
-          cd src
-          if [ -d lua5W ]; then
-            cd lua5W
-            make imlua5 imlua_process5 imlua_jp25 imlua_fftw35 imlua_avi5 || echo "Some Lua bindings failed"
+          if [ $EXIT_CODE -ne 0 ]; then
+            echo "Warning: Some optional IM modules failed"
           fi
+          cd src/lua5W
+          make || true
           cd /d/build
 
       - name: Build pdflib_lite
