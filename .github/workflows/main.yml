@@ -161,19 +161,21 @@ jobs:
           export LUA_LIB=/d/build/lua54/install/lib
           export FLAGS="-Wno-error=incompatible-pointer-types"
           
-          # Build core CD library (excluding cdpdf which requires pdflib)
           cd /d/build/cd/src
-          make cd
+          
+          # Build core CD modules (excluding cdpdf which requires pdflib)
+          echo "=== Building CD core libraries ==="
+          make cd cdgl cdim cdcontextplus
           
           if [ ! -f ../lib/dllw4_64/cd.dll ]; then
             echo "ERROR: Core CD DLL failed to build"
             exit 1
           fi
-          echo "Core CD DLL built successfully"
+          echo "Core CD libraries built successfully"
           
-          # Build CD Lua bindings
+          # Build CD Lua bindings (excluding cdluapdf5 which requires pdflib)
           echo "=== Building CD Lua bindings ==="
-          make cdlua5
+          make cdlua5 cdluagl5 cdluaim5 cdluacontextplus5
           
           if [ $? -ne 0 ]; then
             echo "ERROR: CD Lua bindings build failed"
