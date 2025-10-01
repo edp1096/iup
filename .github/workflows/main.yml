@@ -33,8 +33,8 @@ jobs:
             tar
             wget
             sed
-            mingw-w64-x86_64-fftw
-            mingw-w64-x86_64-jasper
+            # mingw-w64-x86_64-fftw
+            # mingw-w64-x86_64-jasper
             mingw-w64-x86_64-lua
 
       - name: Setup Lua paths
@@ -45,9 +45,16 @@ jobs:
           ls -la /mingw64/bin/lua* || true
           ls -la /mingw64/lib/liblua* || true
           
-          cp /mingw64/bin/lua.exe /d/build/lua54/install/bin/ 2>/dev/null || cp /mingw64/bin/lua54.exe /d/build/lua54/install/bin/lua.exe
+          # Copy lua54.exe as primary executable
+          cp /mingw64/bin/lua.exe /d/build/lua54/install/bin/lua54.exe 2>/dev/null || cp /mingw64/bin/lua54.exe /d/build/lua54/install/bin/lua54.exe
+          
+          # # Also copy as lua.exe for compatibility
+          # cp /d/build/lua54/install/bin/lua54.exe /d/build/lua54/install/bin/lua.exe
+          
+          # Copy luac
           cp /mingw64/bin/luac.exe /d/build/lua54/install/bin/ 2>/dev/null || cp /mingw64/bin/luac54.exe /d/build/lua54/install/bin/luac.exe
           
+          # Copy DLL
           if [ -f /mingw64/bin/lua54.dll ]; then
             cp /mingw64/bin/lua54.dll /d/build/lua54/install/bin/
           elif [ -f /mingw64/bin/lua5.4.dll ]; then
@@ -56,12 +63,14 @@ jobs:
             cp /mingw64/bin/liblua.dll /d/build/lua54/install/bin/lua54.dll
           fi
           
+          # Copy import library
           if [ -f /mingw64/lib/liblua.dll.a ]; then
             cp /mingw64/lib/liblua.dll.a /d/build/lua54/install/lib/liblua54.a
           elif [ -f /mingw64/lib/liblua.a ]; then
             cp /mingw64/lib/liblua.a /d/build/lua54/install/lib/liblua54.a
           fi
           
+          # Copy headers
           cp /mingw64/include/lua*.h /d/build/lua54/install/include/
           
           echo "=== Copied Lua files ==="
@@ -282,15 +291,15 @@ jobs:
         with:
           files: iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64-dll.tar.gz
           tag_name: ${{ env.IUP_VERSION }}-build-${{ env.PADDED_BUILD }}
-          name: IUP/CD/IM ${{ env.IUP_VERSION }} Build ${{ env.PADDED_BUILD }} (DLL)
+          name: IUP/CD/IM ${{ env.IUP_VERSION }} Build ${{ env.PADDED_BUILD }}
           body: |
             Automated build of IUP/CD/IM ${{ env.IUP_VERSION }} with Lua ${{ env.LUA_VERSION }} for Windows x64 (DLL version)
 
             Includes:
-            - IUP ${{ env.IUP_VERSION }} (DLL)
-            - CD ${{ env.CD_VERSION }} (DLL)
-            - IM ${{ env.IM_VERSION }} (DLL)
-            - Lua ${{ env.LUA_VERSION }}
+            - IUP ${{ env.IUP_VERSION }}
+            - CD ${{ env.CD_VERSION }}
+            - IM ${{ env.IM_VERSION }}
+            - Lua ${{ env.LUA_VERSION }} - lua54.exe
             - iuplua54.exe (Lua interpreter with IUP)
             - All dependencies (zlib, freetype, ftgl)
             - Lua bindings for IUP, CD, IM
