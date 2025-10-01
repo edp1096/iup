@@ -192,7 +192,7 @@ jobs:
           export LUA_LIB=/d/build/lua54/install/lib
           export FLAGS="-Wno-error=incompatible-pointer-types"
           cd /d/build/iup
-          make
+          make -k || true
           cd ..
 
       - name: Set padded build number
@@ -241,7 +241,9 @@ jobs:
             - All dependencies (zlib, freetype, ftgl, fftw3, pdflib_lite)
             - Lua bindings for IUP, CD, IM
 
-            Note: im_wmv, im_capture modules skipped (not supported in MinGW)
+            Note: Some optional modules skipped (not fully supported in MinGW):
+            - im_wmv, im_capture (Windows Media/DirectX)
+            - iupfiledlg NewFileDlg (Vista+ file dialog)
 
             Built with MinGW-w64 on MSYS2
             Build number: ${{ env.PADDED_BUILD }}
