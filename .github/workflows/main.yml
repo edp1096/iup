@@ -196,9 +196,13 @@ jobs:
           export LUA_LIB=/d/build/lua54/install/lib
           export FLAGS="-Wno-error=incompatible-pointer-types"
           cd /d/build/iup
-          # Only build what works on MinGW
-          make iup iupcd iupcontrols iupgl iupglcontrols iup_plot iup_scintilla iupim iupimglib iupole iuplua5
-          cd ..
+          # Build C libraries first
+          make iup iupcd iupcontrols iupgl iupglcontrols iup_plot iup_scintilla iupim iupimglib iupole
+          # Build Lua bindings manually, excluding problematic ones
+          cd srclua5
+          export EXCLUDE_TARGETS="iupluafiledlg iupluaweb"
+          make
+          cd /d/build
 
       - name: Verify Build Results
         run: |
