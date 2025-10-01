@@ -291,7 +291,7 @@ jobs:
           tag_name: ${{ env.IUP_VERSION }}-build-${{ env.PADDED_BUILD }}
           name: IUP/CD/IM ${{ env.IUP_VERSION }} Build ${{ env.PADDED_BUILD }}
           body: |
-            Automated build of IUP/CD/IM ${{ env.IUP_VERSION }} with Lua ${{ env.LUA_VERSION }} for Windows x64 (DLL version)
+            Automated build of IUP/CD/IM ${{ env.IUP_VERSION }} with Lua ${{ env.LUA_VERSION }} for Windows x64
 
             Includes:
             - IUP ${{ env.IUP_VERSION }}
