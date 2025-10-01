@@ -181,7 +181,8 @@ jobs:
 
           # Build core IM libraries
           cd /d/build/im/src
-          make im im_process im_jp2 im_avi
+          # make im im_process im_jp2 im_avi
+          make im im_jp2 im_avi im_process im_process_omp
 
           if [ ! -f ../lib/dllw4_64/im.dll ]; then
             echo "ERROR: Core IM DLL failed to build"
@@ -191,7 +192,7 @@ jobs:
 
           # Build Lua bindings
           echo "=== Building Lua bindings ==="
-          make imlua5 imlua_process5 imlua_jp25
+          make imlua5 im_avi5 imlua_process5 imlua_jp25
 
           if [ $? -ne 0 ]; then
             echo "ERROR: Lua bindings build failed"
