@@ -99,6 +99,7 @@ jobs:
           export TECTOOLS_HOME=/d/build
           cd /d/build/zlib/src
           make
+          ls ../lib/dllw4_64
           cd ../..
 
       - name: Build freetype
@@ -108,6 +109,7 @@ jobs:
           export NO_DEPEND=Yes
           cd /d/build/freetype/src
           make
+          ls ../lib/dllw4_64
           cd ../..
 
       - name: Build ftgl
@@ -117,185 +119,186 @@ jobs:
           export NO_DEPEND=Yes
           cd /d/build/ftgl/src
           make
+          ls ../lib/dllw4_64
           cd ../..
 
-      - name: Build IM
-        run: |
-          export TEC_UNAME=dllw4_64
-          export TEC_TOOLCHAIN=""
-          export USE_LUA_VERSION=54
-          export NO_DEPEND=Yes
-          export TECTOOLS_HOME=/d/build
-          export LUA_INC=/d/build/lua54/install/include
-          export LUA_LIB=/d/build/lua54/install/lib
+      # - name: Build IM
+      #   run: |
+      #     export TEC_UNAME=dllw4_64
+      #     export TEC_TOOLCHAIN=""
+      #     export USE_LUA_VERSION=54
+      #     export NO_DEPEND=Yes
+      #     export TECTOOLS_HOME=/d/build
+      #     export LUA_INC=/d/build/lua54/install/include
+      #     export LUA_LIB=/d/build/lua54/install/lib
           
-          # Build core IM libraries
-          cd /d/build/im/src
-          make im im_process im_jp2
+      #     # Build core IM libraries
+      #     cd /d/build/im/src
+      #     make im im_process im_jp2
           
-          if [ ! -f ../lib/dllw4_64/im.dll ]; then
-            echo "ERROR: Core IM DLL failed to build"
-            exit 1
-          fi
-          echo "Core IM DLL built successfully"
+      #     if [ ! -f ../lib/dllw4_64/im.dll ]; then
+      #       echo "ERROR: Core IM DLL failed to build"
+      #       exit 1
+      #     fi
+      #     echo "Core IM DLL built successfully"
           
-          # Build Lua bindings
-          echo "=== Building Lua bindings ==="
-          make imlua5 imlua_process5 imlua_jp25
+      #     # Build Lua bindings
+      #     echo "=== Building Lua bindings ==="
+      #     make imlua5 imlua_process5 imlua_jp25
           
-          if [ $? -ne 0 ]; then
-            echo "ERROR: Lua bindings build failed"
-            exit 1
-          fi
+      #     if [ $? -ne 0 ]; then
+      #       echo "ERROR: Lua bindings build failed"
+      #       exit 1
+      #     fi
           
-          echo "IM Lua bindings built successfully"
-          cd /d/build
+      #     echo "IM Lua bindings built successfully"
+      #     cd /d/build
 
-      - name: Build CD
-        run: |
-          export TEC_UNAME=dllw4_64
-          export TEC_TOOLCHAIN=""
-          export USE_LUA_VERSION=54
-          export NO_DEPEND=Yes
-          export TECTOOLS_HOME=/d/build
-          export LUA_INC=/d/build/lua54/install/include
-          export LUA_LIB=/d/build/lua54/install/lib
-          export FLAGS="-Wno-error=incompatible-pointer-types"
+      # - name: Build CD
+      #   run: |
+      #     export TEC_UNAME=dllw4_64
+      #     export TEC_TOOLCHAIN=""
+      #     export USE_LUA_VERSION=54
+      #     export NO_DEPEND=Yes
+      #     export TECTOOLS_HOME=/d/build
+      #     export LUA_INC=/d/build/lua54/install/include
+      #     export LUA_LIB=/d/build/lua54/install/lib
+      #     export FLAGS="-Wno-error=incompatible-pointer-types"
           
-          cd /d/build/cd/src
+      #     cd /d/build/cd/src
           
-          # Build core CD modules (excluding cdpdf which requires pdflib)
-          echo "=== Building CD core libraries ==="
-          make cd cdgl cdim cdcontextplus
+      #     # Build core CD modules (excluding cdpdf which requires pdflib)
+      #     echo "=== Building CD core libraries ==="
+      #     make cd cdgl cdim cdcontextplus
           
-          if [ ! -f ../lib/dllw4_64/cd.dll ]; then
-            echo "ERROR: Core CD DLL failed to build"
-            exit 1
-          fi
-          echo "Core CD libraries built successfully"
+      #     if [ ! -f ../lib/dllw4_64/cd.dll ]; then
+      #       echo "ERROR: Core CD DLL failed to build"
+      #       exit 1
+      #     fi
+      #     echo "Core CD libraries built successfully"
           
-          # Build CD Lua bindings (excluding cdluapdf5 which requires pdflib)
-          echo "=== Building CD Lua bindings ==="
-          make cdlua5 cdluagl5 cdluaim5 cdluacontextplus5
+      #     # Build CD Lua bindings (excluding cdluapdf5 which requires pdflib)
+      #     echo "=== Building CD Lua bindings ==="
+      #     make cdlua5 cdluagl5 cdluaim5 cdluacontextplus5
           
-          if [ $? -ne 0 ]; then
-            echo "ERROR: CD Lua bindings build failed"
-            exit 1
-          fi
+      #     if [ $? -ne 0 ]; then
+      #       echo "ERROR: CD Lua bindings build failed"
+      #       exit 1
+      #     fi
           
-          echo "CD Lua bindings built successfully"
-          cd /d/build
+      #     echo "CD Lua bindings built successfully"
+      #     cd /d/build
 
-      - name: Build IUP
-        run: |
-          export TEC_UNAME=dllw4_64  # mingw4_64 → dllw4_64
-          export TEC_TOOLCHAIN=""
-          export USE_LUA_VERSION=54
-          export NO_DEPEND=Yes
-          export TECTOOLS_HOME=/d/build
-          export LUA_INC=/d/build/lua54/install/include
-          export LUA_LIB=/d/build/lua54/install/lib
-          export FLAGS="-Wno-error=incompatible-pointer-types"
-          cd /d/build/iup
-          make iup iupcd iupcontrols iupgl iupglcontrols iup_plot iup_scintilla iupim iupimglib iupole
-          cd srclua5
-          make -k || true
-          cd /d/build/iup
-          if [ ! -f lib/dllw4_64/iup.dll ]; then  # 경로 및 파일 수정
-            echo "ERROR: Core IUP DLL failed"
-            exit 1
-          fi
-          echo "IUP build successful"
-          cd /d/build
+      # - name: Build IUP
+      #   run: |
+      #     export TEC_UNAME=dllw4_64  # mingw4_64 → dllw4_64
+      #     export TEC_TOOLCHAIN=""
+      #     export USE_LUA_VERSION=54
+      #     export NO_DEPEND=Yes
+      #     export TECTOOLS_HOME=/d/build
+      #     export LUA_INC=/d/build/lua54/install/include
+      #     export LUA_LIB=/d/build/lua54/install/lib
+      #     export FLAGS="-Wno-error=incompatible-pointer-types"
+      #     cd /d/build/iup
+      #     make iup iupcd iupcontrols iupgl iupglcontrols iup_plot iup_scintilla iupim iupimglib iupole
+      #     cd srclua5
+      #     make -k || true
+      #     cd /d/build/iup
+      #     if [ ! -f lib/dllw4_64/iup.dll ]; then  # 경로 및 파일 수정
+      #       echo "ERROR: Core IUP DLL failed"
+      #       exit 1
+      #     fi
+      #     echo "IUP build successful"
+      #     cd /d/build
 
-      - name: Verify Build Results
-        run: |
-          echo "=== Checking built libraries ==="
-          echo "--- IUP DLLs ---"
-          find /d/build/iup/lib/dllw4_64 -name "*.dll" 2>/dev/null | head -20
-          echo "--- CD DLLs ---"
-          find /d/build/cd/lib/dllw4_64 -name "*.dll" 2>/dev/null | head -20
-          echo "--- IM DLLs ---"
-          find /d/build/im/lib/dllw4_64 -name "*.dll" 2>/dev/null | head -20
+      # - name: Verify Build Results
+      #   run: |
+      #     echo "=== Checking built libraries ==="
+      #     echo "--- IUP DLLs ---"
+      #     find /d/build/iup/lib/dllw4_64 -name "*.dll" 2>/dev/null | head -20
+      #     echo "--- CD DLLs ---"
+      #     find /d/build/cd/lib/dllw4_64 -name "*.dll" 2>/dev/null | head -20
+      #     echo "--- IM DLLs ---"
+      #     find /d/build/im/lib/dllw4_64 -name "*.dll" 2>/dev/null | head -20
 
-      - name: Set padded build number
-        run: |
-          echo "PADDED_BUILD=$(printf '%04d' ${{ github.run_number }})" >> $GITHUB_ENV
+      # - name: Set padded build number
+      #   run: |
+      #     echo "PADDED_BUILD=$(printf '%04d' ${{ github.run_number }})" >> $GITHUB_ENV
 
-      - name: Package Results
-        run: |
-          mkdir -p /d/dist/{lib,include,bin}
+      # - name: Package Results
+      #   run: |
+      #     mkdir -p /d/dist/{lib,include,bin}
           
-          echo "Copying Lua..."
-          cp -r /d/build/lua54/install/* /d/dist/
+      #     echo "Copying Lua..."
+      #     cp -r /d/build/lua54/install/* /d/dist/
           
-          echo "Copying IUP DLLs and import libraries..."
-          find /d/build/iup/lib/dllw4_64 -type f \( -name "*.dll" -o -name "*.a" \) -exec cp -v {} /d/dist/bin/ \;
+      #     echo "Copying IUP DLLs and import libraries..."
+      #     find /d/build/iup/lib/dllw4_64 -type f \( -name "*.dll" -o -name "*.a" \) -exec cp -v {} /d/dist/bin/ \;
           
-          echo "Copying CD DLLs and import libraries..."
-          find /d/build/cd/lib/dllw4_64 -type f \( -name "*.dll" -o -name "*.a" \) -exec cp -v {} /d/dist/bin/ \;
+      #     echo "Copying CD DLLs and import libraries..."
+      #     find /d/build/cd/lib/dllw4_64 -type f \( -name "*.dll" -o -name "*.a" \) -exec cp -v {} /d/dist/bin/ \;
           
-          echo "Copying IM DLLs and import libraries..."
-          find /d/build/im/lib/dllw4_64 -type f \( -name "*.dll" -o -name "*.a" \) -exec cp -v {} /d/dist/bin/ \;
+      #     echo "Copying IM DLLs and import libraries..."
+      #     find /d/build/im/lib/dllw4_64 -type f \( -name "*.dll" -o -name "*.a" \) -exec cp -v {} /d/dist/bin/ \;
           
-          echo "Copying headers..."
-          cp -r /d/build/iup/include/* /d/dist/include/ 2>/dev/null || true
-          cp -r /d/build/cd/include/* /d/dist/include/ 2>/dev/null || true
-          cp -r /d/build/im/include/* /d/dist/include/ 2>/dev/null || true
+      #     echo "Copying headers..."
+      #     cp -r /d/build/iup/include/* /d/dist/include/ 2>/dev/null || true
+      #     cp -r /d/build/cd/include/* /d/dist/include/ 2>/dev/null || true
+      #     cp -r /d/build/im/include/* /d/dist/include/ 2>/dev/null || true
           
-          echo "=== Package contents ==="
-          echo "DLLs:"
-          ls -lah /d/dist/bin/*.dll 2>/dev/null | head -30
-          echo "Import libraries:"
-          ls -lah /d/dist/bin/*.a 2>/dev/null | head -10
+      #     echo "=== Package contents ==="
+      #     echo "DLLs:"
+      #     ls -lah /d/dist/bin/*.dll 2>/dev/null | head -30
+      #     echo "Import libraries:"
+      #     ls -lah /d/dist/bin/*.a 2>/dev/null | head -10
           
-          # Create tar.gz in GitHub workspace
-          cd $GITHUB_WORKSPACE
-          tar -czf iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64-dll.tar.gz -C /d dist/
-          ls -lh *.tar.gz
+      #     # Create tar.gz in GitHub workspace
+      #     cd $GITHUB_WORKSPACE
+      #     tar -czf iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64-dll.tar.gz -C /d dist/
+      #     ls -lh *.tar.gz
 
-      - name: Upload Build
-        uses: actions/upload-artifact@v4
-        with:
-          name: iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64-dll
-          path: iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64-dll.tar.gz
+      # - name: Upload Build
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64-dll
+      #     path: iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64-dll.tar.gz
 
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64-dll.tar.gz
-          tag_name: ${{ env.IUP_VERSION }}-build-${{ env.PADDED_BUILD }}
+      # - name: Create Release
+      #   uses: softprops/action-gh-release@v1
+      #   with:
+      #     files: iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64-dll.tar.gz
+      #     tag_name: ${{ env.IUP_VERSION }}-build-${{ env.PADDED_BUILD }}
 
-      - name: Upload Build
-        uses: actions/upload-artifact@v4
-        with:
-          name: iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64-dll
-          path: /d/iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64-dll.tar.gz
+      # - name: Upload Build
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64-dll
+      #     path: /d/iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64-dll.tar.gz
 
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: /d/iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64-dll.tar.gz
-          tag_name: ${{ env.IUP_VERSION }}-build-${{ env.PADDED_BUILD }}
-          name: IUP/CD/IM ${{ env.IUP_VERSION }} Build ${{ env.PADDED_BUILD }} (DLL)
-          body: |
-            Automated build of IUP/CD/IM ${{ env.IUP_VERSION }} with Lua ${{ env.LUA_VERSION }} for Windows x64 (DLL version)
+      # - name: Create Release
+      #   uses: softprops/action-gh-release@v1
+      #   with:
+      #     files: /d/iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64-dll.tar.gz
+      #     tag_name: ${{ env.IUP_VERSION }}-build-${{ env.PADDED_BUILD }}
+      #     name: IUP/CD/IM ${{ env.IUP_VERSION }} Build ${{ env.PADDED_BUILD }} (DLL)
+      #     body: |
+      #       Automated build of IUP/CD/IM ${{ env.IUP_VERSION }} with Lua ${{ env.LUA_VERSION }} for Windows x64 (DLL version)
 
-            Includes:
-            - IUP ${{ env.IUP_VERSION }} (DLL)
-            - CD ${{ env.CD_VERSION }} (DLL)
-            - IM ${{ env.IM_VERSION }} (DLL) - core, process, jp2
-            - Lua ${{ env.LUA_VERSION }}
-            - All dependencies (zlib, freetype, ftgl)
-            - Lua bindings for IUP, CD, IM
+      #       Includes:
+      #       - IUP ${{ env.IUP_VERSION }} (DLL)
+      #       - CD ${{ env.CD_VERSION }} (DLL)
+      #       - IM ${{ env.IM_VERSION }} (DLL) - core, process, jp2
+      #       - Lua ${{ env.LUA_VERSION }}
+      #       - All dependencies (zlib, freetype, ftgl)
+      #       - Lua bindings for IUP, CD, IM
 
-            DLLs and import libraries (.a) are in the bin/ directory
-            Headers are in the include/ directory
+      #       DLLs and import libraries (.a) are in the bin/ directory
+      #       Headers are in the include/ directory
 
-            Note: Excluded modules - im_wmv, im_capture, im_avi, im_fftw3
+      #       Note: Excluded modules - im_wmv, im_capture, im_avi, im_fftw3
 
-            Built with MinGW-w64 on MSYS2
-            Build number: ${{ env.PADDED_BUILD }}
-            Commit: ${{ github.sha }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #       Built with MinGW-w64 on MSYS2
+      #       Build number: ${{ env.PADDED_BUILD }}
+      #       Commit: ${{ github.sha }}
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
