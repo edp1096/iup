@@ -275,19 +275,19 @@ jobs:
       - name: Create Archive
         run: |
           cd $GITHUB_WORKSPACE
-          tar -czf iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64-dll.tar.gz -C /d dist/
+          tar -czf iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64.tar.gz -C /d dist/
           ls -lh *.tar.gz
 
       - name: Upload Build
         uses: actions/upload-artifact@v4
         with:
-          name: iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64-dll
-          path: iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64-dll.tar.gz
+          name: iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64
+          path: iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64.tar.gz
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64-dll.tar.gz
+          files: iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64.tar.gz
           tag_name: ${{ env.IUP_VERSION }}-build-${{ env.PADDED_BUILD }}
           name: IUP/CD/IM ${{ env.IUP_VERSION }} Build ${{ env.PADDED_BUILD }}
           body: |
