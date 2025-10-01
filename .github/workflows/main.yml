@@ -249,8 +249,22 @@ jobs:
           echo "Import libraries:"
           ls -lah /d/dist/bin/*.a 2>/dev/null | head -10
           
-          cd /d
-          tar -czf iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64-dll.tar.gz dist/
+          # Create tar.gz in GitHub workspace
+          cd $GITHUB_WORKSPACE
+          tar -czf iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64-dll.tar.gz -C /d dist/
+          ls -lh *.tar.gz
+
+      - name: Upload Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64-dll
+          path: iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64-dll.tar.gz
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64-dll.tar.gz
+          tag_name: ${{ env.IUP_VERSION }}-build-${{ env.PADDED_BUILD }}
 
       - name: Upload Build
         uses: actions/upload-artifact@v4
