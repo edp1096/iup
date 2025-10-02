@@ -35,6 +35,7 @@ jobs:
             sed
             mingw-w64-x86_64-lua
             mingw-w64-x86_64-pango
+            mingw-w64-x86_64-harfbuzz
             mingw-w64-x86_64-cairo
 
       - name: Setup Lua paths
@@ -202,7 +203,7 @@ jobs:
           export LUA_BIN=/d/build/lua54/install/bin
           export FLAGS="-Wno-error=incompatible-pointer-types"
           
-          export EXTRAINCS="/mingw64/include/cairo /mingw64/include/pango-1.0 /mingw64/include/glib-2.0 /mingw64/lib/glib-2.0/include"
+          export EXTRAINCS="/mingw64/include/cairo /mingw64/include/pango-1.0 /mingw64/include/glib-2.0 /mingw64/lib/glib-2.0/include /mingw64/include/harfbuzz"
           export LDIR="/mingw64/lib"
 
           cd /d/build/cd/src
@@ -223,6 +224,7 @@ jobs:
           cp /mingw64/bin/libpango-1.0-0.dll /d/dist/bin/
           cp /mingw64/bin/libpangocairo-1.0-0.dll /d/dist/bin/
           cp /mingw64/bin/libpangowin32-1.0-0.dll /d/dist/bin/
+          cp /mingw64/bin/libharfbuzz-0.dll /d/dist/bin/
           
           cd /d/build
 

@@ -1,8 +1,3 @@
-* Used MinGW 15.2.0
-* Lua 5.4.8, IUP 3.32
-* Not used GPL features but LGPL
-
-
 ## Usage
 
 ```lua
@@ -21,9 +16,15 @@ end
 ```
 
 
-* Official
-    * IUP - https://sourceforge.net/projects/iup
-    * CD - https://sourceforge.net/projects/canvasdraw
-    * IM - https://sourceforge.net/projects/imtoolkit
+## Note
 
-* https://github.com/rjpcomputing/luaforwindows
+* Used MinGW 15.2.0
+* Lua 5.4.8, IUP 3.32
+* Not used GPL features but LGPL
+* Build for my personal use, see below if more features necessary
+    * Official & source
+        * IUP - https://sourceforge.net/projects/iup
+        * CD - https://sourceforge.net/projects/canvasdraw
+        * IM - https://sourceforge.net/projects/imtoolkit
+    * https://github.com/rjpcomputing/luaforwindows
+
