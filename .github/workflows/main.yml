@@ -53,31 +53,15 @@ jobs:
       - name: Build Lua
         run: |
           cd /d/build/lua54/src
-          
-          # Backup original luaconf.h
-          cp luaconf.h luaconf.h.bak
-          
-          # Modify LUA_CPATH_DEFAULT to include both ?.dll and ?54.dll patterns
-          sed -i 's|#define LUA_CPATH_DEFAULT.*|#define LUA_CPATH_DEFAULT \\\n\t".\\\\?.dll;.\\\\?54.dll;" \\\n\t".\\\\..\\\\lib\\\\lua\\\\5.4\\\\?.dll;.\\\\..\\\\lib\\\\lua\\\\5.4\\\\loadall.dll;.\\\\?.dll"|' luaconf.h
-          
-          # Build Lua for MinGW
+          sed -i 's|LUA_CDIR"?.dll;"|LUA_CDIR"?.dll;" LUA_CDIR"?54.dll;"|' luaconf.h
           make mingw
-          
-          # Install to custom directory
           mkdir -p /d/build/lua54/install/{bin,lib,include}
           cp lua.exe /d/build/lua54/install/bin/lua54.exe
           cp lua.exe /d/build/lua54/install/bin/lua.exe
           cp luac.exe /d/build/lua54/install/bin/
           cp lua54.dll /d/build/lua54/install/bin/
           cp liblua.a /d/build/lua54/install/lib/liblua54.a
-          
-          cd ../src
           cp lua.h luaconf.h lualib.h lauxlib.h lua.hpp /d/build/lua54/install/include/
-          
-          echo "=== Built Lua files ==="
-          ls -la /d/build/lua54/install/bin/
-          ls -la /d/build/lua54/install/lib/
-          
           cd /d/build
 
       - name: Download IUP dependencies from SourceForge
