@@ -4,7 +4,6 @@
 --[[
     hello.lua
 ]]
-package.cpath = package.cpath .. ";?54.dll" -- Require run lua.exe not lua54.exe
 require("iuplua")
 require("iupluacontrols")
 
@@ -27,4 +26,3 @@ end
         * CD - https://sourceforge.net/projects/canvasdraw
         * IM - https://sourceforge.net/projects/imtoolkit
     * https://github.com/rjpcomputing/luaforwindows
-
