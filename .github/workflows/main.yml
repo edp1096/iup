@@ -265,7 +265,7 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64.tar.gz
+          files: iup-windows-amd64.tar.gz
           tag_name: ${{ env.IUP_VERSION }}-build-${{ env.PADDED_BUILD }}
           name: IUP/CD/IM ${{ env.IUP_VERSION }} Build ${{ env.PADDED_BUILD }}
           body: |
