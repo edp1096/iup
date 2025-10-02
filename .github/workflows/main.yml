@@ -260,9 +260,11 @@ jobs:
 
       - name: Upload Build
         uses: actions/upload-artifact@v4
+        # name: iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64
+        # path: iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64.tar.gz
         with:
-          name: iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64
-          path: iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64.tar.gz
+          name: iup-windows-amd64
+          path: iup-windows-amd64.tar.gz
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
