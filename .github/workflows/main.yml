@@ -200,6 +200,10 @@ jobs:
           export LUA_LIB=/d/build/lua54/install/lib
           export LUA_BIN=/d/build/lua54/install/bin
           export FLAGS="-Wno-error=incompatible-pointer-types"
+          
+          # Add cairo paths
+          export EXTRAINCS="/mingw64/include/cairo"
+          export LDIR="/mingw64/lib"
 
           cd /d/build/cd/src
           make cd cdgl cdim cdcontextplus cdcairo
@@ -211,17 +215,27 @@ jobs:
 
           make cdlua5 cdluagl5 cdluaim5 cdluacontextplus5 cdluacairo5
 
-          # Copy CD DLLs and import libraries
           find ../lib/dllw4_64 -name "*.dll" -exec cp -v {} /d/dist/bin/ \;
           find ../lib/dllw4_64 -name "*.a" -exec cp -v {} /d/dist/lib/ \;
           
-          # Copy cairo DLL from MSYS2
+          # Copy cairo DLL dependencies
           echo "Copying cairo dependencies..."
           cp /mingw64/bin/libcairo-2.dll /d/dist/bin/
           cp /mingw64/bin/libpixman-1-0.dll /d/dist/bin/
           cp /mingw64/bin/libpng16-16.dll /d/dist/bin/
           cp /mingw64/bin/libfontconfig-1.dll /d/dist/bin/
           cp /mingw64/bin/libexpat-1.dll /d/dist/bin/
+          cp /mingw64/bin/libfreetype-6.dll /d/dist/bin/
+          cp /mingw64/bin/libbz2-1.dll /d/dist/bin/
+          cp /mingw64/bin/libbrotlidec.dll /d/dist/bin/
+          cp /mingw64/bin/libbrotlicommon.dll /d/dist/bin/
+          cp /mingw64/bin/libharfbuzz-0.dll /d/dist/bin/
+          cp /mingw64/bin/libglib-2.0-0.dll /d/dist/bin/
+          cp /mingw64/bin/libintl-8.dll /d/dist/bin/
+          cp /mingw64/bin/libiconv-2.dll /d/dist/bin/
+          cp /mingw64/bin/libpcre2-8-0.dll /d/dist/bin/
+          cp /mingw64/bin/libgraphite2.dll /d/dist/bin/
+          cp /mingw64/bin/zlib1.dll /d/dist/bin/ 2>/dev/null || true
           
           cd /d/build
 
