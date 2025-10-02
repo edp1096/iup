@@ -276,7 +276,7 @@ jobs:
             - CD ${{ env.CD_VERSION }}
             - IM ${{ env.IM_VERSION }}
             - Lua ${{ env.LUA_VERSION }} (custom built with ?54.dll pattern support)
-            - lua54.exe, lua.exe (Lua interpreters)
+            - lua.exe (Lua interpreters)
             - iuplua54.exe (Lua interpreter with IUP)
             - All dependencies (zlib, freetype, ftgl)
             - Lua bindings for IUP, CD, IM
