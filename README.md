@@ -20,7 +20,7 @@ end
 * Used MinGW 15.2.0
 * Lua 5.4.8, IUP 3.32
 * Not used GPL features but LGPL
-* Build for my personal use, see below if more features necessary
+* Build for my personal use on MS-Windows, see below if more features necessary
     * Official & source
         * IUP - https://sourceforge.net/projects/iup
         * CD - https://sourceforge.net/projects/canvasdraw
