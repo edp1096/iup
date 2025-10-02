@@ -202,30 +202,19 @@ jobs:
           export LUA_LIB=/d/build/lua54/install/lib
           export LUA_BIN=/d/build/lua54/install/bin
           export FLAGS="-Wno-error=incompatible-pointer-types"
-          
-          export EXTRAINCS="/mingw64/include/cairo /mingw64/include/pango-1.0 /mingw64/include/glib-2.0 /mingw64/lib/glib-2.0/include /mingw64/include/harfbuzz"
-          export LDIR="/mingw64/lib"
 
           cd /d/build/cd/src
-          make cd cdgl cdim cdcontextplus cdcairo
+          make cd cdgl cdim cdcontextplus
 
           if [ ! -f ../lib/dllw4_64/cd.dll ]; then
             echo "ERROR: Core CD DLL failed to build"
             exit 1
           fi
 
-          make cdlua5 cdluagl5 cdluaim5 cdluacontextplus5 cdluacairo5
+          make cdlua5 cdluagl5 cdluaim5 cdluacontextplus5
 
           find ../lib/dllw4_64 -name "*.dll" -exec cp -v {} /d/dist/bin/ \;
           find ../lib/dllw4_64 -name "*.a" -exec cp -v {} /d/dist/lib/ \;
-          
-          # Copy required runtime DLLs
-          cp /mingw64/bin/libcairo-2.dll /d/dist/bin/
-          cp /mingw64/bin/libpango-1.0-0.dll /d/dist/bin/
-          cp /mingw64/bin/libpangocairo-1.0-0.dll /d/dist/bin/
-          cp /mingw64/bin/libpangowin32-1.0-0.dll /d/dist/bin/
-          cp /mingw64/bin/libharfbuzz-0.dll /d/dist/bin/
-          
           cd /d/build
 
       - name: Build IUP
