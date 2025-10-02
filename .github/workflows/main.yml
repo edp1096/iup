@@ -55,6 +55,7 @@ jobs:
           cd /d/build/lua54/src
           sed -i 's|LUA_CDIR"?.dll;"|LUA_CDIR"?.dll;" LUA_CDIR"?54.dll;"|' luaconf.h
           make mingw
+
           mkdir -p /d/build/lua54/install/{bin,lib,include}
           cp lua.exe /d/build/lua54/install/bin/lua54.exe
           cp lua.exe /d/build/lua54/install/bin/lua.exe
@@ -62,6 +63,7 @@ jobs:
           cp lua54.dll /d/build/lua54/install/bin/
           cp liblua.a /d/build/lua54/install/lib/liblua54.a
           cp lua.h luaconf.h lualib.h lauxlib.h lua.hpp /d/build/lua54/install/include/
+
           cd /d/build
 
       - name: Download IUP dependencies from SourceForge
@@ -102,10 +104,10 @@ jobs:
           export TEC_TOOLCHAIN=""
           export NO_DEPEND=Yes
           export TECTOOLS_HOME=/d/build
-          
+
           cd /d/build/zlib/src
           make
-          
+
           cp ../lib/dllw4_64/*.dll /d/dist/bin/
           cp ../lib/dllw4_64/*.a /d/dist/lib/
           cd /d/build
@@ -115,10 +117,10 @@ jobs:
           export TEC_UNAME=dllw4_64
           export TEC_TOOLCHAIN=""
           export NO_DEPEND=Yes
-          
+
           cd /d/build/freetype/src
           make
-          
+
           cp ../lib/dllw4_64/*.dll /d/dist/bin/
           cp ../lib/dllw4_64/*.a /d/dist/lib/
           cd /d/build
@@ -128,10 +130,10 @@ jobs:
           export TEC_UNAME=dllw4_64
           export TEC_TOOLCHAIN=""
           export NO_DEPEND=Yes
-          
+
           cd /d/build/ftgl/src
           make
-          
+
           cp ../lib/dllw4_64/*.dll /d/dist/bin/ 2>/dev/null || true
           cp ../lib/dllw4_64/*.a /d/dist/lib/ 2>/dev/null || true
           cd /d/build
@@ -198,24 +200,24 @@ jobs:
           export LUA_LIB=/d/build/lua54/install/lib
           export LUA_BIN=/d/build/lua54/install/bin
           export FLAGS="-Wno-error=incompatible-pointer-types"
-          
+
           cd /d/build/iup
           make iup iupcd iupcontrols iupgl iupglcontrols iup_plot iup_scintilla iupim iupimglib iupole
-          
+
           cd src
           TEC_UNAME=mingw4_64 make -f ../tecmakewin.mak MF=iupstub
           mkdir -p ../lib/dllw4_64
           mv ../lib/mingw4_64/libiupstub.a ../lib/dllw4_64/
           cd ..
-          
+
           make -C srclua5 -k || true
           make iupluaconsole
-          
+
           if [ ! -f lib/dllw4_64/iup.dll ]; then
             echo "ERROR: Core IUP DLL failed"
             exit 1
           fi
-          
+
           find lib/dllw4_64 -name "*.dll" -exec cp -v {} /d/dist/bin/ \;
           find lib/dllw4_64 -name "*.a" -exec cp -v {} /d/dist/lib/ \;
           find bin -name "*.exe" -exec cp -v {} /d/dist/bin/ \;
