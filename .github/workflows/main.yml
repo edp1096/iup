@@ -34,6 +34,7 @@ jobs:
             wget
             sed
             mingw-w64-x86_64-lua
+            mingw-w64-x86_64-cairo
 
       - name: Setup Lua paths
         run: |
@@ -210,8 +211,18 @@ jobs:
 
           make cdlua5 cdluagl5 cdluaim5 cdluacontextplus5 cdluacairo5
 
+          # Copy CD DLLs and import libraries
           find ../lib/dllw4_64 -name "*.dll" -exec cp -v {} /d/dist/bin/ \;
           find ../lib/dllw4_64 -name "*.a" -exec cp -v {} /d/dist/lib/ \;
+          
+          # Copy cairo DLL from MSYS2
+          echo "Copying cairo dependencies..."
+          cp /mingw64/bin/libcairo-2.dll /d/dist/bin/
+          cp /mingw64/bin/libpixman-1-0.dll /d/dist/bin/
+          cp /mingw64/bin/libpng16-16.dll /d/dist/bin/
+          cp /mingw64/bin/libfontconfig-1.dll /d/dist/bin/
+          cp /mingw64/bin/libexpat-1.dll /d/dist/bin/
+          
           cd /d/build
 
       - name: Build IUP
