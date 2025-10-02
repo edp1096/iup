@@ -61,7 +61,7 @@ jobs:
           cp lua.exe /d/build/lua54/install/bin/lua.exe
           cp luac.exe /d/build/lua54/install/bin/
           cp lua54.dll /d/build/lua54/install/bin/
-          cp liblua.a /d/build/lua54/install/lib/liblua54.a
+          dlltool --dllname lua54.dll --def lua54.def --output-lib /d/build/lua54/install/lib/liblua54.dll.a 2>/dev/null || ar rcs /d/build/lua54/install/lib/liblua54.dll.a
           cp lua.h luaconf.h lualib.h lauxlib.h lua.hpp /d/build/lua54/install/include/
 
           cd /d/build
