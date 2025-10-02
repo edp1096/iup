@@ -251,9 +251,11 @@ jobs:
           echo "PADDED_BUILD=$(printf '%04d' ${{ github.run_number }})" >> $GITHUB_ENV
 
       - name: Create Archive
+        # tar -czf iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64.tar.gz -C /d dist/
         run: |
           cd $GITHUB_WORKSPACE
-          tar -czf iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64.tar.gz -C /d dist/
+          cp -r dist iup
+          tar -czf iup-windows-amd64.tar.gz -C /d iup/
           ls -lh *.tar.gz
 
       - name: Upload Build
