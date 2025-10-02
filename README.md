@@ -4,6 +4,9 @@
 --[[
     hello.lua
 ]]
+-- If not use other lua interpreter, add this
+-- package.cpath = package.cpath .. ";?.dll;?54.dll"
+
 require("iuplua")
 require("iupluacontrols")
 
