@@ -58,7 +58,6 @@ jobs:
           make mingw
 
           mkdir -p /d/build/lua54/install/{bin,lib,include}
-          cp lua.exe /d/build/lua54/install/bin/lua54.exe
           cp lua.exe /d/build/lua54/install/bin/lua.exe
           cp luac.exe /d/build/lua54/install/bin/
           cp lua54.dll /d/build/lua54/install/bin/
