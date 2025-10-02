@@ -17,7 +17,7 @@ end
 
 ## Note
 
-* Used MinGW 15.2.0
+* Used MinGW GCC 15.2.0
 * Lua 5.4.8, IUP 3.32
 * Not used GPL features but LGPL
 * Build for my personal use on MS-Windows, see below if more features necessary
