@@ -254,6 +254,8 @@ jobs:
         # tar -czf iup-cd-im-lua-${{ env.IUP_VERSION }}-build${{ env.PADDED_BUILD }}-win64.tar.gz -C /d dist/
         run: |
           cd $GITHUB_WORKSPACE
+          ls
+          pwd
           cp -r dist iup
           tar -czf iup-windows-amd64.tar.gz -C /d iup/
           ls -lh *.tar.gz
