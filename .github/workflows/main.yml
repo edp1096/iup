@@ -1,4 +1,4 @@
-name: Build IUP, CD, IM with Lua (DLL)
+name: Build IUP, CD, IM with Lua
 on:
   push:
   workflow_dispatch:
